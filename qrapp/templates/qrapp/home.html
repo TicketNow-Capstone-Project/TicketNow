@@ -1,0 +1,70 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Driver QR Generator</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        #qr-reader { width: 300px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Driver Registration</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Generate QR</button>
+    </form>
+
+    {% if qr_code %}
+        <h2>Generated QR Code</h2>
+        <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code"><br>
+        <a href="{% static qr_filename %}" download>Download Saved QR Code</a>
+    {% endif %}
+
+    {% if qr_code %}
+        <hr>
+        <h2>📷 Camera QR Scanner</h2>
+        <div id="qr-reader"></div>
+        <p><strong>Camera Scan Result:</strong> <span id="qr-result">Waiting...</span></p>
+
+        <h2>🖼️ Upload QR Image to Scan</h2>
+        <input type="file" accept="image/*" id="qr-upload"><br>
+        <p><strong>File Scan Result:</strong> <span id="qr-file-result">Waiting...</span></p>
+    {% endif %}
+
+    <script>
+        // Camera Scanner
+        function onScanSuccess(decodedText, decodedResult) {
+            document.getElementById("qr-result").innerText = decodedText;
+        }
+
+        const html5QrCode = new Html5Qrcode("qr-reader");
+        html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: 250 },
+            onScanSuccess
+        ).catch(err => {
+            document.getElementById("qr-result").innerText = "Camera error: " + err;
+        });
+
+        // File Upload Scanner
+        const uploadInput = document.getElementById('qr-upload');
+        uploadInput.addEventListener('change', function () {
+            if (uploadInput.files.length === 0) return;
+            const file = uploadInput.files[0];
+            const qrScanner = new Html5QrcodeScanner("qr-file-result", {}, false);
+            Html5Qrcode.getCameras().then(() => {
+                Html5Qrcode.scanFile(file, true)
+                    .then(decodedText => {
+                        document.getElementById("qr-file-result").innerText = decodedText;
+                    })
+                    .catch(err => {
+                        document.getElementById("qr-file-result").innerText = "Unable to scan: " + err;
+                    });
+            });
+        });
+    </script>
+</body>
+</html>
