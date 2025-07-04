@@ -1,3 +1,4 @@
+docs-update-readme-and-user-guide
 # 🚗 TicketNow – QR Code Generator & Scanner for Drivers
 
 TicketNow is a simple web app that lets you generate QR codes with driver and vehicle information, and scan those QR codes using your webcam or image files. Perfect for delivery check-ins, transport terminals, or quick access logs.
@@ -134,4 +135,8 @@ This project is licensed under the `MIT License`.
 Built using:
 * `Django`
 * `html5-qrcode`
+
+=======
+# TicketNow
+An Integrated Terminal Management and Ticketing System in Maasin City Terminal
 
