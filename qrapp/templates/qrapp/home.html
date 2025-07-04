@@ -24,31 +24,27 @@
     {% endif %}
 
     {% if qr_code %}
-        <hr>
-        <h2>📷 Camera QR Scanner</h2>
-        <div id="qr-reader"></div>
-        <p><strong>Camera Scan Result:</strong> <span id="qr-result">Waiting...</span></p>
-
-        <h2>🖼️ Upload QR Image to Scan</h2>
-        <input type="file" accept="image/*" id="qr-upload"><br>
-        <p><strong>File Scan Result:</strong> <span id="qr-file-result">Waiting...</span></p>
+        <h2 class="text-xl font-bold mt-8 mb-2">Scan QR Code</h2>
+        <div id="reader" class="border p-4 w-full max-w-md"></div>
+        <p id="scan-result" class="mt-4 text-green-600 font-medium"></p>
     {% endif %}
+
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <script>
         // Camera Scanner
-        function onScanSuccess(decodedText, decodedResult) {
-            document.getElementById("qr-result").innerText = decodedText;
-        }
+    function onScanSuccess(decodedText, decodedResult) {
+        document.getElementById('scan-result').innerText = "Scanned QR Code: " + decodedText;
+    }
 
-        const html5QrCode = new Html5Qrcode("qr-reader");
-        html5QrCode.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: 250 },
-            onScanSuccess
-        ).catch(err => {
-            document.getElementById("qr-result").innerText = "Camera error: " + err;
-        });
+    function onScanFailure(error) {
+        // Optionally handle scan failures
+    }
 
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader", { fps: 10, qrbox: 250 });
+
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
         // File Upload Scanner
         const uploadInput = document.getElementById('qr-upload');
         uploadInput.addEventListener('change', function () {
