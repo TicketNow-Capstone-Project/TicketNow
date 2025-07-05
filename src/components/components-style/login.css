@@ -5,7 +5,9 @@
   padding: 30px;
   border: 1px solid #090000;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.3); 
+    box-shadow: offset-x offset-y blur-radius color;
+
   font-family: Arial, sans-serif;
 
    position: absolute;
@@ -15,6 +17,9 @@
 }
 .container h2{
   text-align: center;
+  cursor: pointer;
+  color: #08002e;
+
 }
 .form {
   display:flex;
@@ -25,6 +30,8 @@
   margin: 10px 0;
   padding: 10px;
   font-size: 16px;
+  border-radius: 10px;
+  border: 1px solid black;
 }
 .input::placeholder {
   font-size: 14px;
@@ -32,12 +39,36 @@
   color: #888;
 }
 
-
+label{
+  color: #08002e;
+}
 .button {
   padding: 10px;
   font-size: 16px;
+  margin: 12px 0;
   background-color: #4caf50;
   color: white;
   border: none;
   cursor: pointer;
+}
+
+.back-btn{
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: #08002e;
+  font-size: 14px; 
+  transition: transform 0.2s ease;
+}
+
+.back-btn:hover {
+  transform: scale(1.05);
+  color: rgb(29, 13, 13);             /* prevent hover color change */
+  text-decoration: none;    /* prevent underline on hover */
+}
+.back-btn img{
+  height: 0.8em; /* match the text height */
+  margin-right: 6px; /* space between icon and text */
+  display: inline-block;
+  vertical-align: middle;
 }

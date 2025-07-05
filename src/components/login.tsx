@@ -15,10 +15,14 @@ const Login: React.FC = () => {
       alert("Invalid email or password");
     }
   };
-
   return (
     <div className="container">
-      <h2>Login Form</h2>
+      <a href="/home" className="back-btn">
+        <img src="/left-arrow.png" alt="Back" />
+        <b>Back</b>
+      </a>
+
+      <h2>TicketNow LogIn</h2>
       <form onSubmit={handleSubmit} className="form">
         <label>Phone Number</label>
         <input
@@ -39,7 +43,7 @@ const Login: React.FC = () => {
           className="input"
         />
         <button type="submit" className="button">
-          Login
+          LOG IN
         </button>
       </form>
     </div>
