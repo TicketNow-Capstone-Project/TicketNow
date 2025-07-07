@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import DriverInfo
 
-
-
-# Register your models here.
-admin.site.register(DriverInfo)
+@admin.register(DriverInfo)
+class DriverInfoAdmin(admin.ModelAdmin):
+    list_display = ['first_name', 'last_name', 'plate_number', 'vehicle_type', 'route_taken']
+    search_fields = ['plate_number', 'first_name', 'last_name']

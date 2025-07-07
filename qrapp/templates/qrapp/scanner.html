@@ -27,37 +27,75 @@
                 ← Back to Registration Form
             </a>
         </div>
+        <a href="{% url 'queue_monitor' %}" class="text-blue-500 underline">View Queue</a>
+
     </div>
 
     <script>
         const queueList = document.getElementById('driver-queue');
         const scanResult = document.getElementById('scan-result');
-        const scannedDrivers = new Set(); // prevent duplicates
+        const scannedDrivers = new Set();
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
 
         function onScanSuccess(decodedText, decodedResult) {
             if (!scannedDrivers.has(decodedText)) {
                 scannedDrivers.add(decodedText);
 
-                const li = document.createElement('li');
-                li.textContent = decodedText;
-                queueList.appendChild(li);
+                // Extract plate number from QR content (plate number is in line 4)
+                const lines = decodedText.trim().split("\n");
+                const plateNumber = lines[3]?.trim();
 
-                scanResult.textContent = "Scanned: " + decodedText;
+                if (!plateNumber) {
+                    scanResult.textContent = "Invalid QR format.";
+                    return;
+                }
+
+                fetch("{% url 'ajax_scan_driver' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ plate_number: plateNumber })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    scanResult.textContent = data.message;
+
+                    if (data.success) {
+                        const li = document.createElement('li');
+                        li.textContent = `${data.plate_number} – Route: ${data.route} – Departure: ${data.departure_time}`;
+                        queueList.appendChild(li);
+                    }
+                })
+                .catch(error => {
+                    console.error("Scan error:", error);
+                    scanResult.textContent = "Scan failed. Try again.";
+                });
             } else {
-                scanResult.textContent = "Driver already in queue.";
+                scanResult.textContent = "Driver already scanned.";
             }
         }
 
-        function onScanFailure(error) {
-            // Ignore for now
-        }
-
-        // Start scanner
         const html5QrcodeScanner = new Html5QrcodeScanner("reader", {
             fps: 10,
             qrbox: 250
         });
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        html5QrcodeScanner.render(onScanSuccess);
     </script>
 </body>
 </html>

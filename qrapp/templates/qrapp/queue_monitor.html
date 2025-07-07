@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Driver Queue Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta http-equiv="refresh" content="15"> <!-- Auto-refresh every 15 seconds -->
+    <style>
+        html, body {
+            overflow: hidden;
+            height: 100%;
+        }
+        .auto-scale {
+            font-size: 2vw;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col p-4 transition-colors duration-500" id="page">
+    <div class="flex justify-between items-center mb-4">
+        <h1 class="text-5xl font-extrabold text-yellow-400">🚌 Terminal Driver Queue</h1>
+        <button onclick="toggleTheme()" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded">
+            Toggle Theme
+        </button>
+    </div>
+
+    {% if queue %}
+        <table class="w-full table-auto text-center auto-scale">
+            <thead>
+                <tr class="text-yellow-300 border-b border-yellow-400">
+                    <th>#</th>
+                    <th>Route</th>
+                    <th>Departure Time</th>
+                    <th>Plate Number</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="queue-body">
+                {% for item in queue %}
+                    <tr class="border-t border-gray-600 hover:bg-gray-800">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.driver.route_taken }}</td>
+                        <td>{{ item.departure_time|date:"h:i A" }}</td>
+                        <td>{{ item.driver.plate_number }}</td>
+                        <td>
+                            <form action="{% url 'mark_done' item.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded">
+                                    Done
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-center text-2xl text-gray-400 mt-10">No drivers in queue.</p>
+    {% endif %}
+
+    <audio id="alert-sound" src="{% static 'qrapp/beep.mp3' %}" preload="auto"></audio>
+
+    <script>
+        // Dark-Light Toggle
+        function toggleTheme() {
+            const body = document.getElementById('page');
+            body.classList.toggle('bg-white');
+            body.classList.toggle('text-black');
+            body.classList.toggle('bg-gray-900');
+            body.classList.toggle('text-white');
+        }
+
+        // Optional: Play sound when new driver is added (check if row count increases)
+        let prevCount = document.getElementById('queue-body').children.length;
+
+        setInterval(() => {
+            fetch(window.location.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.text())
+                .then(html => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const newRows = temp.querySelectorAll('#queue-body tr');
+                    const newCount = newRows.length;
+
+                    if (newCount > prevCount) {
+                        document.getElementById('alert-sound').play();
+                    }
+                    prevCount = newCount;
+                });
+        }, 10000); // Check every 10 seconds
+    </script>
+</body>
+</html>
+
+<!--
+
+ To add a beep sound when a driver is added to the queue:
+ Save a short sound file (like beep.mp3) in:
+
+arduino
+Copy
+Edit
+qrapp/static/qrapp/beep.mp3
+ Then in your scanner.html, add this line inside <body> (top or bottom, doesn’t matter):
+
+html
+Copy
+Edit
+<audio id="beep-sound" src="{% static 'qrapp/beep.mp3' %}" preload="auto"></audio>
+ Update the onScanSuccess() JavaScript function to play the sound:
+
+javascript
+Copy
+Edit
+const beep = document.getElementById('beep-sound');
+
+function onScanSuccess(decodedText, decodedResult) {
+    if (!scannedDrivers.has(decodedText)) {
+        scannedDrivers.add(decodedText);
+
+        fetch("{% url 'ajax_scan_driver' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ plate_number: decodedText })
+        })
+        .then(response => response.json())
+        .then(data => {
+            scanResult.textContent = data.message;
+
+            if (data.success) {
+                const li = document.createElement('li');
+                li.textContent = `${data.plate_number} – Route: ${data.route} – Departure: ${data.departure_time}`;
+                queueList.appendChild(li);
+
+                //  Play beep on success
+                beep.play();
+            }
+        })
+        .catch(error => {
+            console.error("Scan error:", error);
+            scanResult.textContent = "Scan failed. Try again.";
+        });
+    } else {
+        scanResult.textContent = "Driver already in queue.";
+    }
+}
+
+
+-->
