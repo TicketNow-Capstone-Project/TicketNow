@@ -4,33 +4,282 @@
 <head>
     <meta charset="UTF-8">
     <title>Driver Identification Card</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'qrapp/TICKETNOW_LOGO.png' %}" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to bottom, #1a2a4b, #2a4a7b);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+        }
+        .header-bg { /* Renamed from .header to match your provided class */
+            width: 100%;
+            /* Tailwind classes for flex, justify-between, items-center, py-4, px-8
+               are already applied directly in the HTML, so we just need the background */
+            background-color: #0c1a2e; /* Darker blue for header */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+            position: sticky;
+            top: 0;
+        }
+        .header-bg img { /* Target img within the new header class */
+            /* Tailwind classes h-16 md:h-20 are in HTML */
+            object-fit: contain;
+        }
+        .main-content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card-container {
+            background-color: #3b76bb;
+            border-radius: 20px;
+            padding: 40px 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+        }
+        .card-title {
+            color: #ffffff;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+        .qr-code-section {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            display: inline-block;
+            margin-bottom: 30px;
+        }
+        .qr-code-section img {
+            width: 200px;
+            height: 200px;
+            display: block;
+        }
+        .driver-info {
+            color: #ffffff;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        .driver-info p strong {
+            font-weight: 700;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            width: 100%;
+            flex-wrap: wrap;
+            z-index: 1;
+        }
+        .action-button {
+            background-color: #ffffff;
+            color: #3b76bb;
+            font-weight: 700;
+            padding: 15px 30px;
+            border-radius: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border: none;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        .action-button svg {
+            width: 24px;
+            height: 24px;
+            fill: #3b76bb;
+        }
+        .footer {
+            width: 100%;
+            text-align: right;
+            padding: 20px 50px;
+            background-color: #162542; /* Darker blue for footer - same as header */
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+            position: sticky;
+            bottom: 0;
+        }
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .footer-item svg {
+            width: 16px;
+            height: 16px;
+            fill: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header-bg, .footer { /* Use .header-bg for responsive adjustments */
+                padding: 15px 20px;
+            }
+            .card-container {
+                margin-top: 20px;
+                padding: 30px 15px;
+            }
+            .qr-code-section img {
+                width: 150px;
+                height: 150px;
+            }
+            .button-group {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+            .action-button {
+                width: 80%;
+                justify-content: center;
+            }
+            .footer {
+                align-items: center;
+            }
+        }
+
+        @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        .card-container, .card-container * {
+            visibility: visible;
+        }
+
+        .card-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 85%;
+            margin: auto;
+            border: 2px solid #000; /* Solid black border */
+            padding: 30px;
+            box-shadow: none;
+            background-color: white !important;
+            color: black !important;
+        }
+
+        /* Shorten the title during print */
+        .card-title::before {
+            content: "DRIVER";
+        }
+
+        .card-title {
+            font-size: 1.8rem !important;
+            color: black !important;
+        }
+
+        /* Optional: make QR image slightly smaller on print */
+        .qr-code-section img {
+            width: 160px !important;
+            height: 160px !important;
+        }
+    }
+    </style>
 </head>
-<body class="bg-gray-100 p-10">
-    <div class="max-w-md mx-auto bg-white border border-gray-300 p-6 rounded-2xl shadow-xl">
-        <h1 class="text-center text-xl font-bold text-blue-700 mb-4">
-            Driver Identification Card
-        </h1>
-        <div class="flex justify-between items-start">
-            <div class="text-sm space-y-1">
-                <p><strong>Name:</strong> {{ driver.name }}</p>
-                <p><strong>Address:</strong> {{ driver.address }}</p>
-                <p><strong>Vehicle:</strong> {{ driver.vehicle }}</p>
-                <p><strong>Plate #:</strong> {{ driver.plate_number }}</p>
-                <p><strong>Route:</strong> {{ driver.route }}</p>
-            </div>
-            <div class="ml-4">
+<body>
+    <header class="header-bg py-4 px-8 flex justify-between items-center">
+        <div class="flex items-center">
+            <img src="{% static 'qrapp/TICKETNOW_LOGO.png' %}" alt="TicketNow Logo" class="h-16 md:h-20" />
+        </div>
+        <div></div> {# This div is empty as per your provided header structure #}
+    </header>
+
+    <div class="main-content-wrapper">
+        <div class="card-container">
+            <h1 class="card-title">DRIVER IDENTIFICATION CARD</h1>
+
+            <div class="qr-code-section">
                 {% if qr_code %}
-                    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" class="w-24 h-24">
+                    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
                 {% else %}
                     <p class="text-red-500 text-sm">QR Code not available.</p>
                 {% endif %}
             </div>
+
+            <div class="driver-info">
+                <p><strong>NAME:</strong> {{ driver.name }}</p>
+                <p><strong>ADDRESS:</strong> {{ driver.address }}</p>
+                <p><strong>PLATE NO:</strong> {{ driver.plate_number }}</p>
+                {% comment %}
+                <p><strong>Vehicle:</strong> {{ driver.vehicle }}</p>
+                <p><strong>Route:</strong> {{ driver.route }}</p>
+                {% endcomment %}
+            </div>
         </div>
-        <div class="text-center mt-4">
-            <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">
-                Print ID
+
+        <div class="button-group">
+            <button onclick="window.print()" class="action-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M19 8H5c-1.65 0-3 1.35-3 3v6h4v4h12v-4h4v-6c0-1.65-1.35-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm1-9H4v4h16V3z"/>
+                </svg>
+                PRINT
             </button>
+            <button onclick="alert('Download functionality would be implemented here.')" class="action-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                DOWNLOAD
+            </button>
+            <button onclick="window.history.back()" class="action-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+                BACK
+            </button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02L6.62 10.79z"/>
+            </svg>
+            123-456-7890
+        </div>
+        <div class="footer-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+            </svg>
+            Maasin City, Southern Leyte
+        </div>
+        <div class="footer-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            </svg>
+            TicketNow.com
         </div>
     </div>
 </body>
