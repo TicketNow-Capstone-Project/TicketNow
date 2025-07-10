@@ -1,0 +1,153 @@
+
+.container {
+  max-width: 420px;
+  margin: 50px auto;
+  padding: 30px;
+  border: 1px solid #090000;
+  border-radius: 8px;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.3); 
+    box-shadow: offset-x offset-y blur-radius color;
+
+  font-family: Arial, sans-serif;
+
+   position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.container h2{
+  text-align: center;
+  cursor: pointer;
+  color: #08002e;
+
+}
+
+.gradient-text {
+  background: linear-gradient(
+    90deg,
+    rgba(6, 71, 97, 1) 0%,
+    rgba(19, 22, 212, 1) 50%,
+    rgba(20, 3, 3, 1) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* For Firefox */
+  background-clip: text;
+  color: transparent;
+}
+
+.form {
+  display:flex;
+  flex-direction: column;
+}
+
+.input {
+  margin: 10px 0;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1px solid black;
+}
+.input::placeholder {
+  font-size: 14px;
+  font-style: italic;
+  color: #888;
+}
+
+label{
+  color: #08002e;
+}
+.button {
+  padding: 10px;
+  font-size: 16px;
+  margin: 12px 0;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.back-btn{
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: #08002e;
+  font-size: 14px; 
+  transition: transform 0.2s ease;
+}
+
+.back-btn:hover {
+  transform: scale(1.05);
+  color: rgb(29, 13, 13);             /* prevent hover color change */
+  text-decoration: none;    /* prevent underline on hover */
+}
+.back-btn img{
+  height: 0.8em; /* match the text height */
+  margin-right: 6px; /* space between icon and text */
+  display: inline-block;
+  vertical-align: middle;
+}
+.input-group {
+  display: flex;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.password-input,
+.eye-toggle {
+  padding: 10px;
+  height: 44px; /* set same height */
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.password-input {
+  font-size: 16px;
+  flex: 6;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border: 1px solid black;
+}
+
+.password-input::placeholder {
+  font-size: 14px;
+  font-style: italic;
+  color: #888;
+}
+
+.eye-toggle {
+  flex: 4;
+  background-color: #f0f0f0;
+  border-left: none; /* remove double border between input and button */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border:1px solid black;
+}
+.eye-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.register-prompt {
+  margin-top: 1rem;
+  font-size: 14px;
+  text-align: center;
+}
+
+.register-prompt a {
+  color: #007bff; /* or any theme color */
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.register-prompt a:hover {
+  text-decoration: underline;
+}
+
