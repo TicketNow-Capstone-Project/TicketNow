@@ -4,44 +4,264 @@
 <head>
     <meta charset="UTF-8">
     <title>Driver QR Generator</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'qrapp/TICKETNOW_LOGO.png' %}" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles to match the provided UI */
+        body {
+            background-color: #0d2850; /* Dark blue background */
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+        .form-container {
+            background-color: #3b82f6; /* Lighter blue for the main form card */
+            border-radius: 2rem; /* More rounded corners */
+            padding: 2.5rem; /* Increased padding */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+        }
+        .header-bg {
+            /* Changed to a much darker blue, almost black, for better contrast */
+            background-color: #0c1a2e;
+        }
+        .input-field {
+            background-color: #f0f9ff; /* Very light blue/almost white for input backgrounds */
+            border: 1px solid #bfdbfe; /* Light blue border */
+            border-radius: 0.5rem;
+            padding: 0.65rem 1rem;
+            width: 100%;
+            color: #1f2937; /* Darker text for inputs */
+            outline: none; /* Remove default focus outline */
+        }
+        .input-field:focus {
+            border-color: #2563eb; /* Blue border on focus */
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5); /* Blue glow on focus */
+        }
+        .label-text {
+            color: #e0f2fe; /* Light blue for labels */
+            font-weight: 600; /* Semi-bold labels */
+            margin-bottom: 0.25rem;
+        }
+        .btn-primary {
+            background-color: #0ea5e9; /* Sky blue for primary button */
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem; /* More rounded button */
+            transition: background-color 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-primary:hover {
+            background-color: #0284c7; /* Darker sky blue on hover */
+        }
+        .btn-back {
+            background-color: #a7f3d0; /* Light green for back button */
+            border-radius: 9999px; /* Fully rounded */
+            padding: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            transition: background-color 0.2s ease-in-out;
+        }
+        .btn-back:hover {
+            background-color: #6ee7b7; /* Darker green on hover */
+        }
+        .header-title {
+            color: white; /* White text for header title */
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* Text shadow for title */
+        }
+        .footer-text {
+            color: #dbeafe; /* Light blue for footer text */
+        }
+        .footer-icon {
+            color: #93c5fd; /* Even lighter blue for footer icons */
+        }
+        .error-message {
+            color: #fca5a5; /* Light red for error messages */
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .error-container {
+            background-color: #fee2e2; /* Very light red background */
+            color: #b91c1c; /* Dark red text */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #ef4444; /* Red border */
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
-    <div class="bg-white rounded-2xl shadow-lg p-8 w-full max-w-2xl">
-        <h1 class="text-3xl font-bold text-center text-blue-700 mb-6">Driver Registration</h1>
+<body class="min-h-screen flex flex-col">
 
-        {% if form.errors %}
-            <div class="bg-red-100 text-red-800 p-4 rounded mb-4 border border-red-300">
-                <strong>There were errors with your submission:</strong>
-                <ul class="list-disc list-inside mt-2">
-                    {% for field in form %}
-                        {% for error in field.errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
-                    {% endfor %}
-                </ul>
+    <header class="header-bg py-4 px-8 flex justify-between items-center">
+        <div class="flex items-center">
+            <img src="{% static 'qrapp/TICKETNOW_LOGO.png' %}" alt="TicketNow Logo" class="h-16 md:h-20" />
+        </div>
+        <div></div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="form-container w-full max-w-4xl relative">
+            <div class="absolute top-6 left-8 flex items-center space-x-2">
+                <a href="#" class="btn-back">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="#065f46" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                    </svg>
+                </a>
             </div>
-        {% endif %}
 
-        <form method="POST" action="{% url 'generate_qr' %}" class="space-y-4">
-            {% csrf_token %}
-            {% for field in form %}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.help_text %}
-                        <small class="text-gray-500">{{ field.help_text }}</small>
-                    {% endif %}
-                    {% if field.errors %}
-                        <p class="text-red-600 text-sm mt-1">{{ field.errors }}</p>
-                    {% endif %}
+            <h1 class="header-title text-center mb-10 mt-2">DRIVER REGISTRATION</h1>
+
+            {% if form.errors %}
+                <div class="error-container mb-6">
+                    <strong>There were errors with your submission:</strong>
+                    <ul class="list-disc list-inside mt-2">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
                 </div>
-            {% endfor %}
+            {% endif %}
 
-            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-xl transition duration-200">
-                Generate QR
-            </button>
-        </form>
-    </div>
+            <form method="POST" action="{% url 'generate_qr' %}" class="space-y-6">
+                {% csrf_token %}
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="{{ form.first_name.id_for_label }}" class="block label-text">{{ form.first_name.label }}:</label>
+                        {{ form.first_name.errors }}
+                        <input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}"
+                               class="input-field" placeholder="Enter first name"
+                               value="{{ form.first_name.value|default:'' }}"
+                               {% if form.first_name.field.required %}required{% endif %}>
+                        {% if form.first_name.help_text %}
+                            <small class="text-gray-200 text-sm mt-1 block">{{ form.first_name.help_text }}</small>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.middle_name.id_for_label }}" class="block label-text">{{ form.middle_name.label }}:</label>
+                        {{ form.middle_name.errors }}
+                        <input type="text" name="{{ form.middle_name.name }}" id="{{ form.middle_name.id_for_label }}"
+                               class="input-field" placeholder="Optional"
+                               value="{{ form.middle_name.value|default:'' }}">
+                        {% if form.middle_name.help_text %}
+                            <small class="text-gray-200 text-sm mt-1 block">{{ form.middle_name.help_text }}</small>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.last_name.id_for_label }}" class="block label-text">{{ form.last_name.label }}:</label>
+                        {{ form.last_name.errors }}
+                        <input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}"
+                               class="input-field" placeholder="Enter last name"
+                               value="{{ form.last_name.value|default:'' }}"
+                               {% if form.last_name.field.required %}required{% endif %}>
+                        {% if form.last_name.help_text %}
+                            <small class="text-gray-200 text-sm mt-1 block">{{ form.last_name.help_text }}</small>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-1">
+                        <label for="{{ form.address.id_for_label }}" class="block label-text">{{ form.address.label }}:</label>
+                        {{ form.address.errors }}
+                        <textarea name="{{ form.address.name }}" id="{{ form.address.id_for_label }}"
+                                  class="input-field min-h-[6rem] resize-y" placeholder="Enter Complete Address..."
+                                  {% if form.address.field.required %}required{% endif %}>{{ form.address.value|default:'' }}</textarea>
+                        {% if form.address.help_text %}
+                            <small class="text-gray-200 text-sm mt-1 block">{{ form.address.help_text }}</small>
+                        {% endif %}
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-6">
+                        <div>
+                            <label for="{{ form.vehicle_type.id_for_label }}" class="block label-text">{{ form.vehicle_type.label }}:</label>
+                            {{ form.vehicle_type.errors }}
+                            <div class="relative">
+                                <select name="{{ form.vehicle_type.name }}" id="{{ form.vehicle_type.id_for_label }}"
+                                        class="input-field appearance-none pr-8" {% if form.vehicle_type.field.required %}required{% endif %}>
+                                    {# START: Vehicle Type Options - Easily editable #}
+                                    <option value="" {% if not form.vehicle_type.value %}selected{% endif %}>-- Select Vehicle Type --</option>
+                                    <option value="bus" {% if form.vehicle_type.value == 'bus' %}selected{% endif %}>Bus</option>
+                                    <option value="van" {% if form.vehicle_type.value == 'van' %}selected{% endif %}>Van</option>
+                                    <option value="multicab" {% if form.vehicle_type.value == 'multicab' %}selected{% endif %}>Multicab</option>
+                                    {# END: Vehicle Type Options #}
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                                </div>
+                            </div>
+                            {% if form.vehicle_type.help_text %}
+                                <small class="text-gray-200 text-sm mt-1 block">{{ form.vehicle_type.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label for="{{ form.route_taken.id_for_label }}" class="block label-text">{{ form.route_taken.label }}:</label>
+                            {{ form.route_taken.errors }}
+                            <input type="text" name="{{ form.route_taken.name }}" id="{{ form.route_taken.id_for_label }}"
+                                   class="input-field" placeholder="e.g., Maasin - Hilongos"
+                                   value="{{ form.route_taken.value|default:'' }}"
+                                   {% if form.route_taken.field.required %}required{% endif %}>
+                            {% if form.route_taken.help_text %}
+                                <small class="text-gray-200 text-sm mt-1 block">{{ form.route_taken.help_text }}</small>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label for="{{ form.plate_number.id_for_label }}" class="block label-text">{{ form.plate_number.label }}:</label>
+                            {{ form.plate_number.errors }}
+                            <input type="text" name="{{ form.plate_number.name }}" id="{{ form.plate_number.id_for_label }}"
+                                   class="input-field" placeholder="JK788T"
+                                   value="{{ form.plate_number.value|default:'' }}"
+                                   {% if form.plate_number.field.required %}required{% endif %}>
+                            {% if form.plate_number.help_text %}
+                                <small class="text-gray-200 text-sm mt-1 block">{{ form.plate_number.help_text }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-center mt-8">
+                    <button type="submit" class="btn-primary">
+                        GENERATE QR CODE
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6.75a2.25 2.25 0 113 0m-3 0a2.25 2.25 0 103 0m-3 0h-1.5a2.25 2.25 0 00-2.25 2.25v10.5a2.25 2.25 0 002.25 2.25h10.5a2.25 2.25 0 002.25-2.25V7.5m-9 6h6m-3 3v-6" />
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="header-bg py-4 px-8 flex justify-end items-center space-x-6 text-sm">
+        <div class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 footer-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.355c0-.18-.044-.356-.13-.513L19.5 12l.705-1.282A.75.75 0 0020.25 10.5v-1.5m-1.5 0a2.25 2.25 0 00-2.25-2.25H6.75L4.5 9.75m6 0a2.25 2.25 0 11-4.5 0m4.5 0a2.25 2.25 0 10-4.5 0M9 9.75h1.5M12 9.75h3" />
+            </svg>
+            <span class="footer-text">123-456-7890</span>
+        </div>
+        <div class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 footer-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+            </svg>
+            <span class="footer-text">Maasin City, Southern Leyte</span>
+        </div>
+        <div class="flex items-center space-x-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 footer-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 17.25a4.5 4.5 0 004.5-4.5V9a.75.75 0 00-.75-.75h-1.5a.75.75 0 00-.75.75v3.75a3 3 0 11-6 0V9a.75.75 0 00-.75-.75h-1.5a.75.75 0 00-.75.75v3.75a4.5 4.5 0 004.5 4.5z" />
+            </svg>
+            <span class="footer-text">TicketNow.com</span>
+        </div>
+    </footer>
 </body>
 </html>
