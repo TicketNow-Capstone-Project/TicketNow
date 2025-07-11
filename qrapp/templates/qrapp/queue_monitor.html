@@ -4,60 +4,139 @@
 <head>
     <meta charset="UTF-8">
     <title>Driver Queue Monitor</title>
-    <link rel="shortcut icon" type="image/x-icon" href="../../static/qrapp/TICKETNOW_LOGO.png" />
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'qrapp/TICKETNOW_LOGO.png' %}" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <meta http-equiv="refresh" content="15"> <!-- Auto-refresh every 15 seconds -->
-    <style>
+    <meta http-equiv="refresh" content="15"> <style>
         html, body {
             overflow: hidden;
             height: 100%;
         }
-        .auto-scale {
-            font-size: 2vw;
+        /* Custom colors based on the image for precision */
+        .bg-ticketnow-blue {
+            background-color: #0A2647;
+        }
+        .bg-light-blue-body {
+            background-color: #ADD8E6; /* Light Blue */
+        }
+        .text-ticketnow-blue {
+            color: #0A2647;
+        }
+        .bg-table-header-blue {
+            background-color: #1C4C7E;
+        }
+        .bg-table-row-dark {
+            background-color: #0F355A;
+        }
+        .bg-table-row-light {
+            background-color: #143F6C;
+        }
+        .btn-done-green {
+            background-color: #28A745;
+        }
+        .btn-done-green:hover {
+            background-color: #218838;
+        }
+        /* New custom color for the footer background */
+        .bg-footer-blue {
+            background-color: #001B2C;
+        }
+
+        /* Responsive font size for table cells */
+        .auto-scale-table-text {
+            font-size: clamp(0.8rem, 1.2vw, 1.5rem); /* Min 0.8rem, ideal 1.2vw, Max 1.5rem */
+        }
+        /* Specific height for header to match image more closely */
+        .header-h-custom {
+            height: 120px; /* Approximately 30 units in Tailwind scale, adjust if needed */
+        }
+        /* Larger icon for terminal buttons */
+        .terminal-icon-lg {
+            width: 2.5rem; /* w-10 */
+            height: 2.5rem; /* h-10 */
+        }
+        /* Larger icon for DARK toggle */
+        .dark-toggle-icon-lg {
+            width: 2rem; /* w-8 */
+            height: 2rem; /* h-8 */
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col p-4 transition-colors duration-500" id="page">
-    <div class="flex justify-between items-center mb-4">
-        <h1 class="text-5xl font-extrabold text-yellow-400">🚌 Terminal Driver Queue</h1>
-        <button onclick="toggleTheme()" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded">
-            Toggle Theme
+<body class="bg-light-blue-body text-white min-h-screen flex flex-col transition-colors duration-500" id="page">
+    <div class="bg-ticketnow-blue p-4 flex justify-between items-center header-h-custom">
+        <div class="flex items-center ml-8">
+            <img src="{% static 'qrapp/TICKETNOW_LOGO.png' %}" alt="TicketNow Logo" class="h-24 mr-6">
+            <span class="text-white text-6xl font-extrabold tracking-wider">TICKETNOW</span>
+        </div>
+        <button onclick="toggleTheme()" class="flex items-center bg-transparent text-white font-bold py-2 px-4 rounded-full mr-8">
+            <svg class="dark-toggle-icon-lg mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9 9 0 008.354-5.646z"></path></svg>
+            <span class="text-2xl">DARK</span>
         </button>
     </div>
 
-    {% if queue %}
-        <table class="w-full table-auto text-center auto-scale">
-            <thead>
-                <tr class="text-yellow-300 border-b border-yellow-400">
-                    <th>#</th>
-                    <th>Route</th>
-                    <th>Departure Time</th>
-                    <th>Plate Number</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="queue-body">
-                {% for item in queue %}
-                    <tr class="border-t border-gray-600 hover:bg-gray-800">
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ item.driver.route_taken }}</td>
-                        <td>{{ item.departure_time|date:"h:i A" }}</td>
-                        <td>{{ item.driver.plate_number }}</td>
-                        <td>
-                            <form action="{% url 'mark_done' item.id %}" method="post">
-                                {% csrf_token %}
-                                <button type="submit" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded">
-                                    Done
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p class="text-center text-2xl text-gray-400 mt-10">No drivers in queue.</p>
-    {% endif %}
+    <div class="flex flex-col items-center px-8 py-10 flex-grow">
+        <h1 class="text-5xl font-extrabold text-ticketnow-blue mb-12">TERMINAL DRIVER QUEUE</h1>
+
+        <div class="flex justify-center space-x-8 mb-16">
+            <button onclick="selectTerminal('terminal1')" id="terminal1" class="terminal-button flex items-center space-x-4 bg-white rounded-full px-8 py-4 border-4 border-blue-400 cursor-pointer shadow-xl transition-all duration-200">
+                <svg class="terminal-icon-lg text-blue-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                <span class="text-2xl text-blue-600 font-semibold">TERMINAL 1</span>
+            </button>
+            <button onclick="selectTerminal('terminal2')" id="terminal2" class="terminal-button flex items-center space-x-4 bg-ticketnow-blue rounded-full px-8 py-4 border-4 border-ticketnow-blue cursor-pointer shadow-xl transition-all duration-200">
+                <svg class="terminal-icon-lg text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                <span class="text-2xl text-white font-semibold">TERMINAL 2</span>
+            </button>
+            <button onclick="selectTerminal('terminal3')" id="terminal3" class="terminal-button flex items-center space-x-4 bg-white rounded-full px-8 py-4 border-4 border-blue-400 cursor-pointer shadow-xl transition-all duration-200">
+                <svg class="terminal-icon-lg text-blue-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                <span class="text-2xl text-blue-600 font-semibold">TERMINAL 3</span>
+            </button>
+            <button onclick="selectTerminal('terminal4')" id="terminal4" class="terminal-button flex items-center space-x-4 bg-white rounded-full px-8 py-4 border-4 border-blue-400 cursor-pointer shadow-xl transition-all duration-200">
+                <svg class="terminal-icon-lg text-blue-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                <span class="text-2xl text-blue-600 font-semibold">TERMINAL 4</span>
+            </button>
+        </div>
+
+        <div class="bg-ticketnow-blue rounded-lg shadow-xl p-10 w-full max-w-7xl">
+            {% if queue %}
+                <table class="w-full table-auto text-center auto-scale-table-text">
+                    <thead>
+                        <tr class="bg-table-header-blue text-white text-3xl">
+                            <th class="py-5 px-4 rounded-tl-lg">#</th>
+                            <th class="py-5 px-4">Route</th>
+                            <th class="py-5 px-4">Departure Time</th>
+                            <th class="py-5 px-4">Plate Number</th>
+                            <th class="py-5 px-4 rounded-tr-lg">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="queue-body">
+                        {% for item in queue %}
+                            <tr class="{% if forloop.counter|divisibleby:2 %}bg-table-row-dark{% else %}bg-table-row-light{% endif %} border-b border-ticketnow-blue hover:bg-table-header-blue text-2xl">
+                                <td class="py-5 px-4">{{ forloop.counter }}</td>
+                                <td class="py-5 px-4">{{ item.driver.route_taken }}</td>
+                                <td class="py-5 px-4">{{ item.departure_time|date:"h:i A" }}</td>
+                                <td class="py-5 px-4">{{ item.driver.plate_number }}</td>
+                                <td class="py-5 px-4">
+                                    <form action="{% url 'mark_done' item.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-done-green text-white font-bold py-4 px-10 rounded-full shadow-lg text-xl">
+                                            Done
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-center text-4xl text-gray-400 mt-16">No drivers in queue.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bg-footer-blue p-6 text-white text-right text-lg font-bold"> {# Applied new footer background color, text color is white as per image #}
+        <p>123-456-7890</p>
+        <p>Maasin City, Southern Leyte</p>
+        <p>TicketNow.com</p>
+    </div>
 
     <audio id="alert-sound" src="{% static 'qrapp/beep.mp3' %}" preload="auto"></audio>
 
@@ -65,11 +144,43 @@
         // Dark-Light Toggle
         function toggleTheme() {
             const body = document.getElementById('page');
-            body.classList.toggle('bg-white');
-            body.classList.toggle('text-black');
-            body.classList.toggle('bg-gray-900');
-            body.classList.toggle('text-white');
+            body.classList.toggle('bg-light-blue-body');
+            body.classList.toggle('bg-gray-900'); // Assuming gray-900 for dark mode body background
+            
+            // Further logic for comprehensive dark mode if needed
+            // For example, changing header, footer, table colors etc.
         }
+
+        // Terminal Selection (for future backend integration)
+        function selectTerminal(terminalId) {
+            // Remove active styles from all terminals
+            document.querySelectorAll('.terminal-button').forEach(button => {
+                button.classList.remove('bg-ticketnow-blue', 'border-ticketnow-blue');
+                button.classList.add('bg-white', 'border-blue-400');
+                button.querySelector('svg').classList.remove('text-white');
+                button.querySelector('svg').classList.add('text-blue-600');
+                button.querySelector('span').classList.remove('text-white');
+                button.querySelector('span').classList.add('text-blue-600');
+            });
+
+            // Add active styles to the clicked terminal
+            const selectedButton = document.getElementById(terminalId);
+            selectedButton.classList.remove('bg-white', 'border-blue-400');
+            selectedButton.classList.add('bg-ticketnow-blue', 'border-ticketnow-blue');
+            selectedButton.querySelector('svg').classList.remove('text-blue-600');
+            selectedButton.querySelector('svg').classList.add('text-white');
+            selectedButton.querySelector('span').classList.remove('text-blue-600');
+            selectedButton.querySelector('span').classList.add('text-white');
+
+            // You can add your backend logic here later
+            console.log('Selected Terminal:', terminalId);
+        }
+
+        // Apply initial active style to Terminal 2 (as per the image)
+        document.addEventListener('DOMContentLoaded', () => {
+            selectTerminal('terminal2');
+        });
+
 
         // Optional: Play sound when new driver is added (check if row count increases)
         let prevCount = document.getElementById('queue-body').children.length;
@@ -92,7 +203,6 @@
     </script>
 </body>
 </html>
-
 <!--
 
  To add a beep sound when a driver is added to the queue:
