@@ -151,3 +151,22 @@ label{
   text-decoration: underline;
 }
 
+/* Hide the built-in eye icon in Microsoft Edge and IE */
+input::-ms-reveal {
+  display: none;
+}
+
+/* Hide the built-in eye icon in Chrome (not officially supported, but still works in some cases) */
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+/* General appearance reset for browsers */
+input[type="password"] {
+  appearance: none;
+  -webkit-appearance: none;
+}
