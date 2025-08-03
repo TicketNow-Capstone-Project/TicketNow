@@ -4,6 +4,8 @@ import base64
 import json
 from io import BytesIO
 from datetime import timedelta
+from PIL import Image
+import uuid
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.conf import settings
@@ -11,18 +13,35 @@ from django.template.loader import get_template
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.core.files.base import ContentFile
 
 from .forms import DriverInfoForm
 from .models import DriverInfo, DriverQueue
 
-
 def generate_qr(request):
     if request.method == 'POST':
-        form = DriverInfoForm(request.POST)
+        form = DriverInfoForm(request.POST, request.FILES)
         if form.is_valid():
             instance = form.save()
 
-            # QR data content
+            # Handle image from file upload or base64 webcam capture
+            uploaded_image = request.FILES.get('driver_image')
+            base64_image_data = request.POST.get('driver_image')
+
+            if uploaded_image:
+                instance.driver_image = uploaded_image
+            elif base64_image_data and base64_image_data.startswith("data:image"):
+                import uuid
+                from django.core.files.base import ContentFile
+
+                format, imgstr = base64_image_data.split(';base64,')
+                ext = format.split('/')[-1]
+                image_data = ContentFile(base64.b64decode(imgstr), name=f"{uuid.uuid4()}.{ext}")
+                instance.driver_image = image_data
+
+            instance.save()
+
+            # Generate QR content
             qr_data = (
                 f"{instance.first_name} {instance.middle_name} {instance.last_name}\n"
                 f"{instance.address}\n"
@@ -31,10 +50,8 @@ def generate_qr(request):
                 f"{instance.route_taken}"
             )
 
-            # Generate QR code
             qr_img = qrcode.make(qr_data)
 
-            # Save QR code image to static folder
             qr_folder = os.path.join(settings.BASE_DIR, 'static', 'qrapp')
             os.makedirs(qr_folder, exist_ok=True)
             filename = f"qr_{instance.plate_number}.png"
@@ -48,11 +65,8 @@ def generate_qr(request):
     form = DriverInfoForm()
     return render(request, 'qrapp/home.html', {'form': form})
 
-
 def printable_id(request, driver_id):
     driver = get_object_or_404(DriverInfo, id=driver_id)
-
-    # Read existing QR image from static folder and encode to base64
     qr_path = os.path.join(settings.BASE_DIR, 'static', 'qrapp', f'qr_{driver.plate_number}.png')
     with open(qr_path, "rb") as qr_file:
         qr_code_base64 = base64.b64encode(qr_file.read()).decode()
@@ -62,22 +76,18 @@ def printable_id(request, driver_id):
         'qr_code': qr_code_base64
     })
 
-
 def qr_scanner(request):
     return render(request, 'qrapp/scanner.html')
-
 
 def queue_monitor(request):
     queue = DriverQueue.objects.filter(is_done=False).order_by('departure_time')
     return render(request, 'qrapp/queue_monitor.html', {'queue': queue})
-
 
 def mark_done(request, queue_id):
     queue_item = get_object_or_404(DriverQueue, id=queue_id)
     queue_item.is_done = True
     queue_item.save()
     return redirect('queue_monitor')
-
 
 def handle_scan_logic(plate_number):
     try:
@@ -95,7 +105,6 @@ def handle_scan_logic(plate_number):
         }
     except DriverInfo.DoesNotExist:
         return False, "Driver not found."
-
 
 @csrf_exempt
 def ajax_scan_driver(request):
@@ -115,7 +124,6 @@ def ajax_scan_driver(request):
 
     return JsonResponse({"success": False, "message": "Invalid request."})
 
-
 @csrf_exempt
 def scan_qr_and_queue(request):
     if request.method == 'POST':
@@ -134,7 +142,6 @@ def scan_qr_and_queue(request):
             return JsonResponse({"status": "error", "message": str(e)})
 
     return JsonResponse({"status": "error", "message": "Invalid request."})
-
 
 def download_pdf(request, driver_id):
     driver = get_object_or_404(DriverInfo, id=driver_id)
