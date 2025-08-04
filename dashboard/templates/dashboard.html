@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Staff Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+<body class="bg-gray-300 min-h-screen">
+
+<!-- Header -->
+<div class="text-white flex justify-between items-center px-10 py-8" style="background-color: #0d0d3e;">
+    <!-- STAFF Title -->
+<div class="flex items-center gap-4">
+    <i class="fas fa-users-cog text-white text-4xl"></i>
+    <h1 class="text-4xl tracking-[.4em] font-extrabold">STAFF</h1>
+</div>
+    <!-- Logo and System Name -->
+    <div class="flex items-center gap-8">
+        <!-- Larger Logo -->
+        <img src="{% static 'images/logo.jpg' %}" alt="Logo" class="h-24 w-24 rounded-full border-2 border-white shadow-lg">
+
+        <!-- Bigger Text -->
+        <div class="text-right">
+            <h2 class="font-bold text-2xl leading-tight">TICKET NOW</h2>
+            <p class="text-lg">TERMINAL MANAGEMENT SYSTEM</p>
+        </div>
+    </div>
+</div>
+
+
+
+
+    <!-- Navigation Bar -->
+<div class="bg-white px-6 py-4 flex items-center gap-6 rounded-b-xl shadow-md border border-blue-200">
+
+  <!-- DRIVER REGISTRATION -->
+  <button onclick="toggleModal()" style="background-color: #0d0d3e;"
+    class="bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-700 hover:from-cyan-400 hover:to-blue-600 text-white font-semibold px-6 py-3 rounded-full shadow-md transition-all duration-300 text-sm tracking-wide">
+    DRIVER<br>REGISTRATION
+  </button>
+
+  <!-- TICKETING -->
+  <button onclick="toggleTicketingModal()" style="background-color: #0d0d3e;"
+    class="bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-700 hover:from-cyan-400 hover:to-blue-600 text-white font-semibold px-6 py-3 rounded-full shadow-md transition-all duration-300 text-sm tracking-wide">
+    TICKETING
+  </button>
+
+  <!-- TRIP SCHEDULE -->
+
+  <button onclick="toggleTripScheduleModal()"style="background-color: #0d0d3e;"
+    class="bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-700 hover:from-cyan-400 hover:to-blue-600 text-white font-semibold px-6 py-3 rounded-full shadow-md transition-all duration-300 text-sm tracking-wide">
+    TRIP<br>SCHEDULE
+  </button>
+
+  <button onclick="toggleRegisteredDriverModal()" 
+    style="background-color: #0d0d3e;"
+    class="bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-700 hover:from-cyan-400 hover:to-blue-600 text-white font-semibold px-6 py-3 rounded-full shadow-md transition-all duration-300 text-sm tracking-wide">
+    REGISTERED<br>DRIVER
+</button>
+
+    <!-- Push logout to far right -->
+    <div class="ml-auto">
+ <button
+      class="bg-gradient-to-r from-red-500 via-pink-500 to-red-700 hover:from-red-400 hover:to-red-600 text-white font-semibold px-6 py-2 rounded-full shadow-md transition-all duration-300 text-sm border border-red-300">
+            LOGOUT</button>
+    </div>
+</div>
+
+
+    <!-- Main Content Area -->
+<!-- Main Content Area -->
+<div class="bg-gradient-to-b from-black via-blue-900 to-blue-300 px-6 py-8 h-[calc(100vh-160px)] flex flex-col md:flex-row items-center justify-center gap-8">
+
+  <!-- Terminal Image -->
+  <img src="{% static 'images/terminal.jpg' %}" alt="Maasin Terminal" class="rounded-xl shadow-lg w-full md:w-1/2 max-w-xl">
+
+   <!-- Description with Top-Right Logo -->
+  <div class="text-white w-full md:w-1/2 relative">
+
+    <!-- Logo in top right corner -->
+    <div class="flex justify-between items-start mb-4">
+      <div></div> <!-- Spacer -->
+      <img src="{% static 'images/logo.jpg' %}" alt="Logo" class="h-20 w-20 object-cover rounded-full border border-white shadow">
+    </div>
+
+
+  <!-- Description Text -->
+  <div class="text-white text-center md:text-left">
+    <h2 class="text-2xl font-bold mb-3">Maasin City Integrated Terminal</h2>
+    <p class="text-md leading-relaxed">
+      Welcome to the Maasin City Integrated Terminal and Market Complex — a central hub for passengers traveling across Southern Leyte. 
+      Our system streamlines driver registration and ticket booking to make your travel experience smoother and more efficient.
+    </p>
+  </div>
+
+</div>
+
+
+{% include 'driver_modal.html' %}
+{% include 'ticketing_modal.html' %}
+{% include 'trip_schedule.html' %}
+{% include 'registered_driver.html' %}
+
+
+
+
+</body>
+<script>
+function toggleModal() {
+    const modal = document.getElementById('driverModal');
+    modal.classList.toggle('hidden');
+}
+
+function toggleTicketingModal() {
+  const modal = document.getElementById('ticketingModal');
+  modal.classList.toggle('hidden');
+}
+  function toggleTripScheduleModal() {
+    const modal = document.getElementById('tripScheduleModal');
+    modal.classList.toggle('hidden');
+  }
+  function toggleRegisteredDriverModal() {
+    const modal = document.getElementById('registeredDriverModal');
+    modal.classList.toggle('hidden');
+  }
+</script>
+</html>

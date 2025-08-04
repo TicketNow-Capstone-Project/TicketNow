@@ -1,0 +1,49 @@
+<!-- trip_schedule_modal.html -->
+<div id="tripScheduleModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+  <div style="background-color: #0d0d3e;" class="rounded-xl w-[95%] max-w-4xl p-8 text-white relative shadow-lg">
+
+    <!-- Close Button -->
+    <button onclick="toggleTripScheduleModal()" class="absolute top-4 left-4 bg-white text-black p-2 rounded-full shadow">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+    </button>
+
+    <!-- Header -->
+<h2 class="text-2xl font-bold text-center mb-6 flex justify-center items-center gap-3 text-blue-300">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3M16 7V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+  </svg>
+  TRIP SCHEDULE
+</h2>
+
+
+    <!-- Schedule Table -->
+    <div class="overflow-x-auto">
+<!-- trip_schedule.html -->
+<table class="w-full mt-6 border-collapse">
+  <thead class="bg-blue-100 text-blue-900">
+    <tr>
+      <th class="border px-4 py-2">Destination</th>
+      <th class="border px-4 py-2">Departure Time</th>
+      <th class="border px-4 py-2">Driver</th>
+      <th class="border px-4 py-2">Driver Contact</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for trip in trips %}
+      <tr class="bg-#0d0d3e">
+        <td class="border px-4 py-2">{{ trip.destination }}</td>
+        <td class="border px-4 py-2">{{ trip.departure_time }}</td>
+        <td class="border px-4 py-2">{{ trip.driver }}</td>
+        <td class="border px-4 py-2">{{ trip.driver_contact }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+
+    </div>
+  </div>
+</div>
