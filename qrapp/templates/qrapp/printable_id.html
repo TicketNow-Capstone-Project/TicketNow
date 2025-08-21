@@ -1,0 +1,381 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Driver Identification Card</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'qrapp/TICKETNOW_LOGO.png' %}" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1a2a4b; /* Solid dark blue background matching the image */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        .header-bg {
+            width: 100%;
+            background-color: #0c1a2e; /* Darker blue header matching the image */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+            position: relative; /* Changed from sticky to relative as per image layout */
+            top: 0;
+            display: flex;
+            justify-content: flex-start; /* Align logo to the left */
+            align-items: center;
+            padding: 15px 40px; /* Adjusted padding */
+            box-sizing: border-box; /* Include padding in width */
+        }
+        .header-logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-logo-text {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .main-content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card-container {
+            background-color: #3b76bb; /* Lighter blue for the card matching the image */
+            border-radius: 40px; /* More rounded corners for the card */
+            padding: 20px 30px 40px; /* Adjusted padding as per image */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            margin-top: 40px; /* Increased margin-top for card */
+            margin-bottom: 40px; /* Increased margin-bottom for card */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+            position: relative; /* For positioning the inner logo */
+        }
+        .card-inner-logo {
+            position: absolute;
+            top: 30px; /* Position from top */
+            left: 50%;
+            transform: translateX(-50%); /* Center horizontally */
+            width: 80px; /* Adjust size as seen in image */
+            height: auto;
+        }
+        .card-title {
+            display: none; /* Hide original card title as it's not in the image */
+        }
+        .driver-photo {
+            margin-top: 100px; /* Space for the logo at the top of the card */
+            margin-bottom: 25px; /* Spacing below photo */
+        }
+        .driver-photo img {
+            width: 150px; /* Square photo as per image */
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px; /* Slightly rounded corners for photo */
+            border: 3px solid white; /* White border around photo */
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2); /* Subtle shadow around photo */
+        }
+        .driver-info {
+            color: #ffffff;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 40px; /* Spacing below info before QR */
+            text-transform: uppercase; /* Match uppercase in image */
+            width: 100%; /* Ensure text takes full width to center effectively */
+        }
+        .driver-info p {
+            margin-bottom: 5px; /* Small gap between info lines */
+            text-align: center;
+        }
+        .driver-info p strong {
+            font-weight: 700;
+        }
+        .qr-code-section {
+            background-color: #ffffff; /* White background for QR code */
+            border-radius: 10px; /* Soft rounded corners */
+            padding: 15px; /* Reduced padding for QR code section */
+            margin-bottom: 0; /* No margin below QR code as buttons are separate */
+            display: inline-block; /* To contain its own shadow and center properly */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow around QR code */
+        }
+        .qr-code-section img {
+            width: 180px; /* Size of QR code as per image */
+            height: 180px;
+            display: block;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px; /* Adjusted gap between buttons */
+            margin-top: 40px; /* Spacing between card and buttons */
+            width: 100%;
+            flex-wrap: wrap;
+            z-index: 1;
+        }
+        .action-button {
+            background-color: #ffffff; /* White background for buttons */
+            color: #3b76bb; /* Blue text color for buttons */
+            font-weight: 700;
+            padding: 12px 25px; /* Adjusted padding for buttons */
+            border-radius: 30px; /* Pill-shaped buttons */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Button shadow */
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Slightly reduced gap between icon and text */
+            font-size: 1rem; /* Slightly reduced font size */
+            cursor: pointer;
+            border: none;
+            text-transform: uppercase; /* Uppercase button text */
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        .action-button svg {
+            width: 20px; /* Adjusted icon size */
+            height: 20px;
+            fill: #3b76bb; /* Blue icon color */
+        }
+        .footer {
+            width: 100%;
+            text-align: right;
+            padding: 15px 50px; /* Adjusted padding */
+            background-color: #162542; /* Darker blue footer matching the image */
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: row; /* Horizontal layout for footer items */
+            justify-content: flex-end; /* Align to the right */
+            gap: 20px; /* Increased gap between footer items */
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 2;
+            position: relative; /* Changed from sticky to relative as per image layout */
+            bottom: 0;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .footer-item svg {
+            width: 16px;
+            height: 16px;
+            fill: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header-bg {
+                padding: 10px 20px;
+            }
+            .header-bg img {
+                height: 40px;
+            }
+            .card-container {
+                margin-top: 20px;
+                padding: 15px 20px 30px;
+                border-radius: 30px;
+            }
+            .card-inner-logo {
+                width: 60px;
+                top: 20px;
+            }
+            .driver-photo {
+                margin-top: 80px;
+                margin-bottom: 20px;
+            }
+            .driver-photo img {
+                width: 120px;
+                height: 120px;
+            }
+            .driver-info {
+                font-size: 1rem;
+                margin-bottom: 30px;
+            }
+            .qr-code-section img {
+                width: 130px;
+                height: 130px;
+            }
+            .action-button {
+                width: 100%; /* Full width buttons on small screens */
+                justify-content: center;
+                font-size: 0.95rem;
+                padding: 10px 20px;
+            }
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 30px;
+            }
+            .footer {
+                flex-direction: column;
+                align-items: center;
+                padding: 10px 20px;
+                gap: 5px;
+            }
+        }
+
+        /* Print Specific Styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .card-container, .card-container * {
+                visibility: visible;
+                /* Important: !important to override screen styles */
+            }
+            .card-container {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 85%; /* Adjust width for print */
+                margin: auto;
+                border: 2px solid #000;
+                padding: 20px;
+                box-shadow: none;
+                background-color: white !important; /* Force white background for print */
+                color: black !important; /* Force black text for print */
+                border-radius: 15px !important; /* Less rounded for print */
+                display: flex; /* Ensure flex layout for print */
+                flex-direction: column;
+                align-items: center;
+            }
+            .card-inner-logo {
+                position: static; /* Remove absolute positioning for print */
+                transform: none; /* Remove transform */
+                margin-bottom: 10px; /* Add margin below logo */
+                width: 60px !important; /* Adjust logo size for print */
+                height: auto !important;
+            }
+            .card-title {
+                display: block !important; /* Make title visible for print */
+                font-size: 1.5rem !important; /* Adjust font size for print title */
+                color: black !important;
+                margin-bottom: 15px !important;
+            }
+            .driver-photo {
+                margin-top: 0 !important; /* Remove top margin for print */
+                margin-bottom: 15px !important;
+            }
+            .driver-photo img {
+                width: 120px !important;
+                height: 120px !important;
+                border: 2px solid black !important; /* Black border for print */
+                box-shadow: none !important;
+            }
+            .driver-info {
+                color: black !important; /* Ensure black text for info in print */
+                font-size: 1rem !important;
+                margin-bottom: 20px !important;
+                line-height: 1.4 !important;
+            }
+            .qr-code-section {
+                padding: 10px !important; /* Adjust padding for print */
+                box-shadow: none !important;
+            }
+            .qr-code-section img {
+                width: 150px !important;
+                height: 150px !important;
+            }
+            /* Hide buttons and footer in print */
+            .button-group, .footer, .header-bg {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header-bg">
+        <div class="flex items-center">
+            <img src="{% static 'qrapp/TICKETNOW_LOGO.png' %}" alt="TicketNow Logo" class="h-12 md:h-16" />
+        </div>
+    </header>
+
+    <div class="main-content-wrapper">
+        <div class="card-container">
+            <img src="{% static 'qrapp/TICKETNOW_LOGO.png' %}" alt="TicketNow Logo" class="card-inner-logo" />
+            
+            <h1 class="card-title">DRIVER IDENTIFICATION CARD</h1> <div class="driver-photo">
+                {% if driver.driver_image %}
+                    <img src="{{ driver.driver_image.url }}" alt="Driver Photo">
+                {% else %}
+                    <img src="{% static 'qrapp/photo_placeholder.png' %}" alt="No Photo">
+                {% endif %}
+            </div>
+
+            <div class="driver-info">
+                <p><strong>NAME:</strong> {{ driver.name }}</p>
+                <p><strong>ADDRESS:</strong> {{ driver.address }}</p>
+                <p><strong>PLATE NO:</strong> {{ driver.plate_number }}</p>
+            </div>
+
+            <div class="qr-code-section">
+                {% if qr_code %}
+                    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+                {% else %}
+                    <p class="text-red-500 text-sm">QR Code not available.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button onclick="window.print()" class="action-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M19 8H5c-1.65 0-3 1.35-3 3v6h4v4h12v-4h4v-6c0-1.65-1.35-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm1-9H4v4h16V3z"/>
+                </svg>
+                PRINT
+            </button>
+            <button onclick="alert('Download functionality would be implemented here.')" class="action-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                DOWNLOAD
+            </button>
+            <button onclick="window.history.back()" class="action-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+                BACK
+            </button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02L6.62 10.79z"/>
+            </svg>
+            123-400-7899
+        </div>
+        <div class="footer-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+            </svg>
+            Maasin City, Southern Leyte
+        </div>
+        <div class="footer-item">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            </svg>
+            TicketNow.com
+        </div>
+    </div>
+</body>
+</html>
