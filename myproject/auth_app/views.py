@@ -4,7 +4,20 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .serializers import UserRegistrationSerializer
+from django.middleware.csrf import get_token
 
+# Add this view function
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_csrf_token(request):
+    """
+    Endpoint to get CSRF token for React frontend
+    """
+    token = get_token(request)
+    return Response({
+        'success': True,
+        'csrfToken': token
+    }, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

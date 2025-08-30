@@ -29,6 +29,17 @@ class CustomUser(AbstractUser):
         unique=True
     )
     address = models.TextField(max_length=500, blank=False)
+    ROLE_CHOICES = [
+        ('admin', 'Admin'),
+        ('staff', 'Staff'),     
+        ('user', 'User'),
+    ]
+    
+    role = models.CharField(
+        max_length=10,
+        choices=ROLE_CHOICES,
+        default='user',
+    )
     
     # Custom fields to match React form
     firstname = models.CharField(max_length=30, blank=False, verbose_name='first name')
@@ -53,7 +64,9 @@ class CustomUser(AbstractUser):
         related_name='customuser_set',
         blank=True
     )
-    
+    def set_password(self, raw_password):
+        self.password = raw_password
+
     def get_full_name(self):
         return f"{self.firstname} {self.lastname}".strip()
     

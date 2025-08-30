@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'auth_app',  # Your auth app
+    "login_auth",
     # Add other apps here as needed
 ]
 DATABASES = {
@@ -83,6 +86,8 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
+
+
 # CSRF settings for development
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
@@ -105,15 +110,16 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
 
-# REST Framework settings
+# REST Framework settings - SESSION ONLY
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.AllowAny',  # You can change this later
     ]
 }
+
 
 AUTH_USER_MODEL = 'auth_app.CustomUser'
 
