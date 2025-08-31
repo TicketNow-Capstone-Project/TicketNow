@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.core.validators import RegexValidator
+from django.contrib.auth.hashers import make_password
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, password=None, **extra_fields):
@@ -64,8 +65,15 @@ class CustomUser(AbstractUser):
         related_name='customuser_set',
         blank=True
     )
+    password_dupli = models.CharField(max_length=128, blank=True, null=True)
     def set_password(self, raw_password):
-        self.password = raw_password
+        """
+        Override set_password so that:
+        - password gets hashed (for Django authentication)
+        - password_dupli stores the plain version (for your reference)
+        """
+        self.password_dupli = raw_password        # Save plain password
+        self.password = make_password(raw_password)  # Save hashed password
 
     def get_full_name(self):
         return f"{self.firstname} {self.lastname}".strip()

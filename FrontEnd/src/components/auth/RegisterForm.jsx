@@ -18,6 +18,7 @@ export const RegisterForm = ({ onSubmit, onCancel }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [csrfLoaded, setCsrfLoaded] = useState(false);
 
   // Get CSRF token when component mounts
   useEffect(() => {
@@ -27,20 +28,51 @@ export const RegisterForm = ({ onSubmit, onCancel }) => {
         const existingToken = getCookie('csrftoken');
         if (existingToken) {
           setCsrfToken(existingToken);
+          setCsrfLoaded(true);
           return;
         }
         
         // If no cookie, fetch from API endpoint
         const response = await axios.get(
           'http://localhost:8000/auth/api/csrf-token/',
-          { withCredentials: true }
+          { 
+            withCredentials: true,
+            timeout: 5000 // 5 second timeout
+          }
         );
         
         if (response.data.csrfToken) {
           setCsrfToken(response.data.csrfToken);
+          setCsrfLoaded(true);
+        } else {
+          setApiError({
+            message: 'Failed to get CSRF token from server',
+            field: ''
+          });
         }
       } catch (error) {
         console.error('Failed to get CSRF token:', error);
+        if (error.code === 'ECONNABORTED') {
+          setApiError({
+            message: 'CSRF token request timed out. Check if server is running.',
+            field: ''
+          });
+        } else if (error.response) {
+          setApiError({
+            message: `Server error: ${error.response.status} - ${error.response.statusText}`,
+            field: ''
+          });
+        } else if (error.request) {
+          setApiError({
+            message: 'Cannot connect to server. Make sure the backend is running on localhost:8000',
+            field: ''
+          });
+        } else {
+          setApiError({
+            message: 'Failed to get CSRF token. Please try again.',
+            field: ''
+          });
+        }
       }
     };
 
@@ -62,6 +94,16 @@ export const RegisterForm = ({ onSubmit, onCancel }) => {
     // Clear errors
     setPasswordError('');
     setApiError({ message: '', field: '' });
+
+    // Check if CSRF token is available
+    if (!csrfToken && !getCookie('csrftoken')) {
+      setApiError({
+        message: 'Security token not available. Please refresh the page and try again.',
+        field: ''
+      });
+      setIsLoading(false);
+      return;
+    }
 
     // Validation
     if (formData.password.value !== formData.confirm_password.value) {
@@ -88,36 +130,78 @@ export const RegisterForm = ({ onSubmit, onCancel }) => {
           password: formData.password.value
         },
         {
-          withCredentials: true
+          withCredentials: true,
+          timeout: 10000, // 10 second timeout
+          headers: {
+            'X-CSRFToken': csrfToken || getCookie('csrftoken')
+          }
         }
       );
 
       if (response.data.success) {
         alert('Registration successful! Please login to continue.');
         window.location.href = response.data.redirect || '/login';
-      }
-    } catch (error) {
-      console.error("Registration error:", error.response?.data || error.message);
-      
-      const errorData = error.response?.data || {};
-      
-      if (errorData.field) {  
+      } else if (response.data.error) {
         setApiError({
-          message: errorData.message || errorData.error,
-          field: errorData.field
-        });
-      } else {
-        setApiError({
-          message: errorData.message || errorData.error || 'Registration failed. Please try again.',
+          message: response.data.error,
           field: ''
         });
       }
+    } catch (error) {
+      console.error("Registration error:", error);
+      
+      let errorMessage = 'Registration failed. Please try again.';
+      let errorField = '';
+      
+      // Handle different types of errors
+      if (error.code === 'ECONNABORTED') {
+        errorMessage = 'Request timeout. Server is taking too long to respond.';
+      } else if (error.response) {
+        // Server responded with error status
+        const errorData = error.response.data || {};
+        
+        if (error.response.status === 403) {
+          errorMessage = 'CSRF verification failed. Please refresh the page.';
+        } else if (error.response.status === 400) {
+          // Bad request - validation errors
+          if (errorData.field) {
+            errorField = errorData.field;
+            errorMessage = errorData.message || errorData.error || 'Invalid input';
+          } else if (errorData.username) {
+            errorField = 'username';
+            errorMessage = Array.isArray(errorData.username) 
+              ? errorData.username[0] 
+              : errorData.username;
+          } else if (errorData.email) {
+            errorField = 'email';
+            errorMessage = Array.isArray(errorData.email) 
+              ? errorData.email[0] 
+              : errorData.email;
+          } else if (errorData.non_field_errors) {
+            errorMessage = Array.isArray(errorData.non_field_errors) 
+              ? errorData.non_field_errors[0] 
+              : errorData.non_field_errors;
+          } else {
+            errorMessage = 'Please check your input and try again.';
+          }
+        } else if (error.response.status === 500) {
+          errorMessage = 'Server error. Please try again later.';
+        } else if (errorData.detail) {
+          errorMessage = errorData.detail;
+        }
+      } else if (error.request) {
+        // Network error
+        errorMessage = 'Cannot connect to server. Make sure the backend is running on localhost:8000';
+      }
+      
+      setApiError({
+        message: errorMessage,
+        field: errorField
+      });
     } finally {
       setIsLoading(false);
     }
   };
-
-  // ... rest of your component remains the same
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
@@ -134,6 +218,16 @@ export const RegisterForm = ({ onSubmit, onCancel }) => {
         <h2 className="text-xl font-bold text-gray-900">Create Account</h2>
         <p className="text-xs text-gray-600 mt-1">Join us today and start your journey</p>
       </div>
+
+      {/* CSRF status indicator */}
+      {!csrfLoaded && !apiError.message && (
+        <div className="mb-3 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
+          <p className="text-xs text-yellow-700 flex items-center">
+            <span className="mr-1">⏳</span>
+            Loading security token...
+          </p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-3">
         {/* Name Row */}
@@ -311,7 +405,7 @@ export const RegisterForm = ({ onSubmit, onCancel }) => {
 
         <button 
           type="submit" 
-          disabled={isLoading}
+          disabled={isLoading || !csrfLoaded}
           className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 text-white font-medium py-2 px-4 rounded-md hover:from-cyan-600 hover:to-cyan-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 text-xs"
         >
           {isLoading ? (

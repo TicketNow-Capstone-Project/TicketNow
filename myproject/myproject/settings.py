@@ -11,27 +11,17 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from datetime import timedelta
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-o&!wd3t#4!j*!33a#sky16r)m^w-(7cxnqx_+o!rb1nj64&u+k'
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']  # ✅ Fixed
 
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -45,6 +35,7 @@ INSTALLED_APPS = [
     "login_auth",
     # Add other apps here as needed
 ]
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -62,9 +53,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
-
-# Additional CORS settings for development
-CORS_ALLOW_ALL_ORIGINS = True  # Only for development, remove in production
 CORS_ALLOW_METHODS = [
     'DELETE',
     'GET',
@@ -86,7 +74,7 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
-
+CORS_ALLOW_CREDENTIALS = True  # ✅ Added - CRITICAL for authentication
 
 # CSRF settings for development
 CSRF_TRUSTED_ORIGINS = [
@@ -95,20 +83,19 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # Session settings for API authentication
-# Add these settings for session authentication
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_NAME = 'sessionid'
 SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
 SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_SAMESITE = 'Lax'  # ✅ Added
+SESSION_COOKIE_HTTPONLY = True   # ✅ Added for security
+SESSION_COOKIE_SECURE = False    # For development
 
 # CSRF settings for React
-CSRF_USE_SESSIONS = True
+CSRF_USE_SESSIONS = False  # ✅ Changed to False - use cookies instead of sessions
 CSRF_COOKIE_HTTPONLY = False  # Allow JavaScript to read CSRF token
 CSRF_COOKIE_SAMESITE = 'Lax'
-
-# For development only - allow both HTTP and HTTPS
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False  # For development only
 
 # REST Framework settings - SESSION ONLY
 REST_FRAMEWORK = {
@@ -120,11 +107,11 @@ REST_FRAMEWORK = {
     ]
 }
 
-
 AUTH_USER_MODEL = 'auth_app.CustomUser'
 
+# Middleware - CORRECT ORDER IS CRITICAL
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # ✅ Must be at the top
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -153,11 +140,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -173,25 +157,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
 STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
