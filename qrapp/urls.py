@@ -4,8 +4,14 @@ from . import views
 app_name = "qrapp"
 
 urlpatterns = [
+
+    # Authentication
+    path('', views.user_login, name="login"),
+    path("logout/", views.user_logout, name="logout"),
+    path("dashboard/", views.dashboard, name="dashboard"),
+
     # Dashboard as default homepage
-    path('', views.dashboard, name='dashboard'),
+    #path('', views.dashboard, name='dashboard'),
 
     # Driver registration + QR generation
     path('generate-qr/', views.generate_qr, name='generate_qr'),

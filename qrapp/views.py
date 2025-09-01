@@ -15,8 +15,33 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
 from .forms import DriverInfoForm
 from .models import DriverInfo, DriverQueue
+
+
+def user_login(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect("qrapp:dashboard")  # go to dashboard after login
+        else:
+            messages.error(request, "Invalid username or password")
+    return render(request, "qrapp/login.html")
+
+def user_logout(request):
+    logout(request)
+    return redirect("qrapp:login")
+
+@login_required(login_url="qrapp:login")
+def dashboard(request):
+    return render(request, "qrapp/dashboard.html", {"active_page": "overview"})
 
 
 # ---------------------------
