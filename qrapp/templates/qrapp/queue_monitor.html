@@ -6,7 +6,8 @@
     <title>Driver Queue Monitor</title>
     <link rel="shortcut icon" type="image/x-icon" href="{% static 'qrapp/TICKETNOW_LOGO.png' %}" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <meta http-equiv="refresh" content="15"> <style>
+    <meta http-equiv="refresh" content="15">
+    <style>
         html, body {
             overflow: hidden;
             height: 100%;
@@ -43,21 +44,21 @@
 
         /* Responsive font size for table cells */
         .auto-scale-table-text {
-            font-size: clamp(0.8rem, 1.2vw, 1.5rem); /* Min 0.8rem, ideal 1.2vw, Max 1.5rem */
+            font-size: clamp(0.8rem, 1.2vw, 1.5rem);
         }
         /* Specific height for header to match image more closely */
         .header-h-custom {
-            height: 120px; /* Approximately 30 units in Tailwind scale, adjust if needed */
+            height: 120px;
         }
         /* Larger icon for terminal buttons */
         .terminal-icon-lg {
-            width: 2.5rem; /* w-10 */
-            height: 2.5rem; /* h-10 */
+            width: 2.5rem;
+            height: 2.5rem;
         }
         /* Larger icon for DARK toggle */
         .dark-toggle-icon-lg {
-            width: 2rem; /* w-8 */
-            height: 2rem; /* h-8 */
+            width: 2rem;
+            height: 2rem;
         }
     </style>
 </head>
@@ -67,6 +68,10 @@
             <img src="{% static 'qrapp/TICKETNOW_LOGO.png' %}" alt="TicketNow Logo" class="h-24 mr-6">
             <span class="text-white text-6xl font-extrabold tracking-wider">TICKETNOW</span>
         </div>
+        <a href="{% url 'qrapp:dashboard' %}" 
+           class="bg-white text-ticketnow-blue font-bold py-2 px-6 rounded-full shadow-lg hover:bg-gray-200 transition">
+           ← Back
+        </a>
         <button onclick="toggleTheme()" class="flex items-center bg-transparent text-white font-bold py-2 px-4 rounded-full mr-8">
             <svg class="dark-toggle-icon-lg mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9 9 0 008.354-5.646z"></path></svg>
             <span class="text-2xl">DARK</span>
@@ -115,7 +120,7 @@
                                 <td class="py-5 px-4">{{ item.departure_time|date:"h:i A" }}</td>
                                 <td class="py-5 px-4">{{ item.driver.plate_number }}</td>
                                 <td class="py-5 px-4">
-                                    <form action="{% url 'mark_done' item.id %}" method="post">
+                                    <form action="{% url 'qrapp:mark_done' item.id %}" method="post">
                                         {% csrf_token %}
                                         <button type="submit" class="btn-done-green text-white font-bold py-4 px-10 rounded-full shadow-lg text-xl">
                                             Done
@@ -132,7 +137,7 @@
         </div>
     </div>
 
-    <div class="bg-footer-blue p-6 text-white text-right text-lg font-bold"> {# Applied new footer background color, text color is white as per image #}
+    <div class="bg-footer-blue p-6 text-white text-right text-lg font-bold">
         <p>123-456-7890</p>
         <p>Maasin City, Southern Leyte</p>
         <p>TicketNow.com</p>
@@ -141,19 +146,13 @@
     <audio id="alert-sound" src="{% static 'qrapp/beep.mp3' %}" preload="auto"></audio>
 
     <script>
-        // Dark-Light Toggle
         function toggleTheme() {
             const body = document.getElementById('page');
             body.classList.toggle('bg-light-blue-body');
-            body.classList.toggle('bg-gray-900'); // Assuming gray-900 for dark mode body background
-            
-            // Further logic for comprehensive dark mode if needed
-            // For example, changing header, footer, table colors etc.
+            body.classList.toggle('bg-gray-900');
         }
 
-        // Terminal Selection (for future backend integration)
         function selectTerminal(terminalId) {
-            // Remove active styles from all terminals
             document.querySelectorAll('.terminal-button').forEach(button => {
                 button.classList.remove('bg-ticketnow-blue', 'border-ticketnow-blue');
                 button.classList.add('bg-white', 'border-blue-400');
@@ -163,7 +162,6 @@
                 button.querySelector('span').classList.add('text-blue-600');
             });
 
-            // Add active styles to the clicked terminal
             const selectedButton = document.getElementById(terminalId);
             selectedButton.classList.remove('bg-white', 'border-blue-400');
             selectedButton.classList.add('bg-ticketnow-blue', 'border-ticketnow-blue');
@@ -172,17 +170,13 @@
             selectedButton.querySelector('span').classList.remove('text-blue-600');
             selectedButton.querySelector('span').classList.add('text-white');
 
-            // You can add your backend logic here later
             console.log('Selected Terminal:', terminalId);
         }
 
-        // Apply initial active style to Terminal 2 (as per the image)
         document.addEventListener('DOMContentLoaded', () => {
             selectTerminal('terminal2');
         });
 
-
-        // Optional: Play sound when new driver is added (check if row count increases)
         let prevCount = document.getElementById('queue-body').children.length;
 
         setInterval(() => {
@@ -199,65 +193,12 @@
                     }
                     prevCount = newCount;
                 });
-        }, 10000); // Check every 10 seconds
+        }, 10000);
+
+        // short beep
+        
     </script>
+    
 </body>
 </html>
-<!--
 
- To add a beep sound when a driver is added to the queue:
- Save a short sound file (like beep.mp3) in:
-
-arduino
-Copy
-Edit
-qrapp/static/qrapp/beep.mp3
- Then in your scanner.html, add this line inside <body> (top or bottom, doesn’t matter):
-
-html
-Copy
-Edit
-<audio id="beep-sound" src="{% static 'qrapp/beep.mp3' %}" preload="auto"></audio>
- Update the onScanSuccess() JavaScript function to play the sound:
-
-javascript
-Copy
-Edit
-const beep = document.getElementById('beep-sound');
-
-function onScanSuccess(decodedText, decodedResult) {
-    if (!scannedDrivers.has(decodedText)) {
-        scannedDrivers.add(decodedText);
-
-        fetch("{% url 'ajax_scan_driver' %}", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ plate_number: decodedText })
-        })
-        .then(response => response.json())
-        .then(data => {
-            scanResult.textContent = data.message;
-
-            if (data.success) {
-                const li = document.createElement('li');
-                li.textContent = `${data.plate_number} – Route: ${data.route} – Departure: ${data.departure_time}`;
-                queueList.appendChild(li);
-
-                //  Play beep on success
-                beep.play();
-            }
-        })
-        .catch(error => {
-            console.error("Scan error:", error);
-            scanResult.textContent = "Scan failed. Try again.";
-        });
-    } else {
-        scanResult.textContent = "Driver already in queue.";
-    }
-}
-
-
--->

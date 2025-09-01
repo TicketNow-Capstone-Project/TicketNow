@@ -103,7 +103,7 @@
     <main class="flex-grow flex items-center justify-center p-6">
         <div class="form-container w-full max-w-4xl relative">
             <div class="absolute top-6 left-8 flex items-center space-x-2">
-                <a href="#" class="btn-back">
+                <a href="{% url 'qrapp:dashboard' %}" class="btn-back">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="#065f46" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                     </svg>
@@ -125,7 +125,8 @@
                 </div>
             {% endif %}
 
-            <form method="POST" enctype="multipart/form-data" action="{% url 'generate_qr' %}" class="space-y-6">
+            <!-- ✅ Fixed form action -->
+            <form method="POST" enctype="multipart/form-data" action="{% url 'qrapp:generate_qr' %}" class="space-y-6">
                 {% csrf_token %}
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -166,24 +167,24 @@
 
                 <!-- START: Webcam Capture Section -->
                 <div class="flex flex-col items-center justify-center mt-6 space-y-4">
-    <label class="label-text text-lg">Driver Photo:</label>
+                    <label class="label-text text-lg">Driver Photo:</label>
 
-    <!-- Image Preview / Placeholder -->
-            <div class="w-48 h-48 border-2 border-dashed rounded-lg overflow-hidden bg-white flex items-center justify-center relative">
-                <video id="webcam" autoplay playsinline class="absolute w-full h-full object-cover hidden"></video>
-                <img id="photo-preview" src="{% static 'qrapp/photo_placeholder.png' %}" class="w-full h-full object-cover" />
-                <canvas id="canvas" class="hidden"></canvas>
-            </div>
+                    <!-- Image Preview / Placeholder -->
+                    <div class="w-48 h-48 border-2 border-dashed rounded-lg overflow-hidden bg-white flex items-center justify-center relative">
+                        <video id="webcam" autoplay playsinline class="absolute w-full h-full object-cover hidden"></video>
+                        <img id="photo-preview" src="{% static 'qrapp/photo_placeholder.png' %}" class="w-full h-full object-cover" />
+                        <canvas id="canvas" class="hidden"></canvas>
+                    </div>
 
-            <!-- Button Row -->
-            <div class="flex space-x-4">
-                <button type="button" id="capture-btn" class="btn-primary px-4 py-2">Take Photo</button>
-                <button type="button" id="retake-btn" class="btn-primary bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 hidden">Retake</button>
-            </div>
+                    <!-- Button Row -->
+                    <div class="flex space-x-4">
+                        <button type="button" id="capture-btn" class="btn-primary px-4 py-2">Take Photo</button>
+                        <button type="button" id="retake-btn" class="btn-primary bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 hidden">Retake</button>
+                    </div>
 
-            <!-- Hidden input for base64 photo -->
-            <input type="hidden" name="driver_image" id="driver_image_input">
-        </div>
+                    <!-- Hidden input for base64 photo -->
+                    <input type="hidden" name="driver_image" id="driver_image_input">
+                </div>
                 <!-- END: Webcam Capture Section -->
 
                 <div class="flex justify-center mt-4">

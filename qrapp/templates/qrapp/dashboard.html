@@ -1,0 +1,149 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0b1a2d; }
+        .dashboard-container { background-color: #0b2241; border-radius: 1rem; }
+        .sidebar { background-color: #0b1a2d; border-right: 2px solid #0056b3; }
+        .sidebar-item { color: #d1d5db; padding: 1rem; margin-right: -2px; transition: all 0.2s; }
+        .sidebar-item:hover, .sidebar-item.active { background-color: #0056b3; color: white; }
+        .card { background-color: #1a426f; border-radius: 1rem; color: white; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        .ticket-status { font-size: 0.8rem; padding: 0.2rem 0.5rem; border-radius: 9999px; }
+        .confirmed { background-color: #4CAF50; color: white; }
+        .pending { background-color: #FFC107; color: black; }
+        .loading { background-color: #2196F3; color: white; }
+        .ready { background-color: #4CAF50; color: white; }
+    </style>
+</head>
+<body class="bg-[#0b1a2d] text-white">
+
+<div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <div class="sidebar w-64 p-4 flex flex-col justify-between">
+        <div>
+            <div class="flex items-center mb-8 px-4 py-2 bg-[#0056b3] rounded-full">
+                <img src="{% static 'qrapp/TICKETNOW_LOGO.png' %}" alt="TicketNow Logo" class="h-16 md:h-20">
+                <span class="font-bold text-lg">TICKETNOW</span>
+            </div>
+            <ul class="space-y-4">
+                <li class="sidebar-item {% if active_page == 'overview' %}active{% endif %}">
+                    <a href="{% url 'qrapp:dashboard' %}">Overview</a>
+                </li>
+                <li class="sidebar-item {% if active_page == 'tickets' %}active{% endif %}">
+                    <a href="#">Tickets</a>
+                </li>
+                <li class="sidebar-item {% if active_page == 'drivers' %}active{% endif %}">
+                    <a href="{% url 'qrapp:generate_qr' %}">Drivers</a>
+                </li>
+                <li class="sidebar-item {% if active_page == 'destinations' %}active{% endif %}">
+                    <a href="#">Destinations</a>
+                </li>
+                <li class="sidebar-item {% if active_page == 'trip_queue' %}active{% endif %}">
+                    <a href="{% url 'qrapp:queue_monitor' %}">Trip Queue</a>
+                </li>
+            </ul>
+        </div>
+        <div class="text-xs text-gray-400">
+            <p>123-400-7899</p>
+            <p>Maasin City, Southern Leyte</p>
+            <p>TicketNow.com</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-8 overflow-y-auto">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">ADMIN DASHBOARD</h1>
+            <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center">
+                <span class="text-white font-bold">A</span>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="col-span-1 md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- Total Tickets -->
+                <div class="card p-6 flex flex-col items-center text-center">
+                    <span class="text-3xl font-bold">{{ total_tickets }}</span>
+                    <span class="text-sm text-gray-400">TOTAL TICKETS</span>
+                </div>
+                <!-- Active Drivers -->
+                <div class="card p-6 flex flex-col items-center text-center">
+                    <span class="text-3xl font-bold">{{ active_drivers }}</span>
+                    <span class="text-sm text-gray-400">ACTIVE DRIVERS</span>
+                </div>
+                <!-- Registered Vehicles -->
+                <div class="card p-6 flex flex-col items-center text-center">
+                    <span class="text-3xl font-bold">{{ registered_vehicles }}</span>
+                    <span class="text-sm text-gray-400">REGISTERED VEHICLES</span>
+                </div>
+                <!-- Pending Trips -->
+                <div class="card p-6 flex flex-col items-center text-center">
+                    <span class="text-3xl font-bold">{{ pending_trips }}</span>
+                    <span class="text-sm text-gray-400">PENDING TRIPS</span>
+                </div>
+            </div>
+
+            <!-- Right Section -->
+            <div class="col-span-1 space-y-6">
+                <!-- Recent Tickets -->
+                <div class="card p-6">
+                    <h2 class="text-xl font-bold mb-4">RECENT TICKETS</h2>
+                    <div class="space-y-4">
+                        {% for ticket in recent_tickets %}
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold">{{ ticket.name }}</h3>
+                                <p class="text-xs text-gray-400">{{ ticket.route }}</p>
+                                <span class="ticket-status {{ ticket.status|lower }}">
+                                    {{ ticket.status }}
+                                </span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-bold">{{ ticket.vehicle_type }}</span>
+                                <p class="text-sm">{{ ticket.time }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-gray-400 text-sm">No recent tickets.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Trip Queue -->
+                <div class="card p-6">
+                    <h2 class="text-xl font-bold mb-4">TRIP QUEUE STATUS</h2>
+                    <div class="space-y-4">
+                        {% for item in trip_queue %}
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold">{{ item.driver_name }}</h3>
+                                <p class="text-xs text-gray-400">{{ item.destination }}</p>
+                                <span class="ticket-status {{ item.status|lower }}">
+                                    {{ item.status }}
+                                </span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-bold">{{ item.passengers }} passengers</span>
+                                <p class="text-sm">{{ item.time }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-gray-400 text-sm">No trips in queue.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
