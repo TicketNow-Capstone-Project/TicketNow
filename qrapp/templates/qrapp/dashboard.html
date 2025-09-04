@@ -48,6 +48,9 @@
                 <li class="sidebar-item {% if active_page == 'trip_queue' %}active{% endif %}">
                     <a href="{% url 'qrapp:queue_monitor' %}">Trip Queue</a>
                 </li>
+                <li class="sidebar-item {% if active_page == 'accounts' %}active{% endif %}">
+                    <a href="{% url 'qrapp:accounts' %}">Accounts</a>
+                </li>
             </ul>
         </div>
         <div class="text-xs text-gray-400">
@@ -62,8 +65,14 @@
         <!-- Header -->
         <header class="flex justify-between items-center mb-8">
             <h1 class="text-3xl font-bold">ADMIN DASHBOARD</h1>
-            <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center">
-                <span class="text-white font-bold">A</span>
+            <div class="flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center">
+                    <span class="text-white font-bold">A</span>
+                </div>
+                <a href="{% url 'qrapp:logout' %}" 
+                class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white text-sm">
+                Logout
+                </a>
             </div>
         </header>
 

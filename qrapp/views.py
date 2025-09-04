@@ -15,6 +15,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 
+from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -23,7 +24,13 @@ from .forms import DriverInfoForm
 from .models import DriverInfo, DriverQueue
 
 
+# ---------------------------
+# Authentication
+# ---------------------------
 def user_login(request):
+    if request.user.is_authenticated:
+        return redirect("qrapp:dashboard")  # already logged in → dashboard
+
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
@@ -33,20 +40,82 @@ def user_login(request):
             return redirect("qrapp:dashboard")  # go to dashboard after login
         else:
             messages.error(request, "Invalid username or password")
+
     return render(request, "qrapp/login.html")
 
+
+@login_required(login_url="qrapp:login")
 def user_logout(request):
     logout(request)
-    return redirect("qrapp:login")
+    messages.success(request, "You have been logged out successfully.")
+    return redirect("qrapp:login")  # ✅ always go to login page
 
+
+# ---------------------------
+# Dashboard
+# ---------------------------
 @login_required(login_url="qrapp:login")
 def dashboard(request):
     return render(request, "qrapp/dashboard.html", {"active_page": "overview"})
 
 
 # ---------------------------
+# Admin Accounts Management
+# ---------------------------
+@login_required(login_url="qrapp:login")
+def accounts(request):
+    admins = User.objects.filter(is_staff=True)
+    return render(request, "qrapp/accounts.html", {
+        "admins": admins,
+        "active_page": "accounts",
+    })
+
+
+@login_required(login_url="qrapp:login")
+def delete_account(request, account_id):
+    admin = get_object_or_404(User, id=account_id, is_staff=True)
+    admin.delete()
+    messages.success(request, "Admin account deleted successfully.")
+    return redirect("qrapp:accounts")
+
+
+@login_required(login_url="qrapp:login")
+def change_password(request, account_id):
+    admin = get_object_or_404(User, id=account_id, is_staff=True)
+    if request.method == "POST":
+        new_password = request.POST.get("new_password")
+        if new_password:
+            admin.set_password(new_password)
+            admin.save()
+            messages.success(request, f"Password for {admin.username} updated.")
+            return redirect("qrapp:accounts")
+        else:
+            messages.error(request, "Password cannot be empty.")
+    return render(request, "qrapp/change_password.html", {"admin": admin})
+
+
+@login_required(login_url="qrapp:login")
+def create_account(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+        else:
+            user = User.objects.create_user(username=username, password=password)
+            user.is_staff = True
+            user.save()
+            messages.success(request, f"Admin account {username} created successfully.")
+            return redirect("qrapp:accounts")
+
+    return render(request, "qrapp/create_account.html")
+
+
+# ---------------------------
 # Driver QR Code Generation
 # ---------------------------
+@login_required(login_url="qrapp:login")
 def generate_qr(request):
     if request.method == 'POST':
         form = DriverInfoForm(request.POST, request.FILES)
@@ -70,7 +139,7 @@ def generate_qr(request):
 
             instance.save()
 
-            # Generate QR code with driver info
+            # Generate QR code
             qr_data = (
                 f"{instance.first_name} {instance.middle_name} {instance.last_name}\n"
                 f"{instance.address}\n"
@@ -78,9 +147,7 @@ def generate_qr(request):
                 f"{instance.plate_number}\n"
                 f"{instance.route_taken}"
             )
-
             qr_img = qrcode.make(qr_data)
-
             qr_folder = os.path.join(settings.BASE_DIR, 'static', 'qrapp')
             os.makedirs(qr_folder, exist_ok=True)
             filename = f"qr_{instance.plate_number}.png"
@@ -98,6 +165,7 @@ def generate_qr(request):
 # ---------------------------
 # Printable Driver ID
 # ---------------------------
+@login_required(login_url="qrapp:login")
 def printable_id(request, driver_id):
     driver = get_object_or_404(DriverInfo, id=driver_id)
     qr_path = os.path.join(settings.BASE_DIR, 'static', 'qrapp', f'qr_{driver.plate_number}.png')
@@ -109,37 +177,33 @@ def printable_id(request, driver_id):
         'qr_code': qr_code_base64
     })
 
-# ---------------------------
-# DASHBOARD (Placeholder)
-# ---------------------------
-def dashboard(request):
-    return render(request, "qrapp/dashboard.html")
-
 
 # ---------------------------
 # QR Scanner + Queue System
 # ---------------------------
+@login_required(login_url="qrapp:login")
 def qr_scanner(request):
     return render(request, 'qrapp/scanner.html')
 
 
+@login_required(login_url="qrapp:login")
 def queue_monitor(request):
     queue = DriverQueue.objects.filter(is_done=False).order_by('departure_time')
     return render(request, 'qrapp/queue_monitor.html', {
         "queue": queue,
-        "active_page": "trip_queue",  # highlight Trip Queue
+        "active_page": "trip_queue",
     })
 
 
+@login_required(login_url="qrapp:login")
 def mark_done(request, queue_id):
     queue_item = get_object_or_404(DriverQueue, id=queue_id)
     queue_item.is_done = True
     queue_item.save()
-    return redirect('queue_monitor')
+    return redirect('qrapp:queue_monitor')
 
 
 def handle_scan_logic(plate_number):
-    """Handles driver scan, adds to queue if not already present."""
     try:
         driver = DriverInfo.objects.get(plate_number=plate_number)
         scan_time = timezone.now()
@@ -158,6 +222,7 @@ def handle_scan_logic(plate_number):
 
 
 @csrf_exempt
+@login_required(login_url="qrapp:login")
 def ajax_scan_driver(request):
     if request.method == "POST":
         try:
@@ -177,6 +242,7 @@ def ajax_scan_driver(request):
 
 
 @csrf_exempt
+@login_required(login_url="qrapp:login")
 def scan_qr_and_queue(request):
     if request.method == 'POST':
         qr_data = request.POST.get('qr_data', '').strip()
@@ -196,12 +262,10 @@ def scan_qr_and_queue(request):
     return JsonResponse({"status": "error", "message": "Invalid request."})
 
 
-
-
-
 # ---------------------------
-# PDF Download (Placeholder)
+# PDF Download (Stub)
 # ---------------------------
+@login_required(login_url="qrapp:login")
 def download_pdf(request, driver_id):
     driver = get_object_or_404(DriverInfo, id=driver_id)
     template = get_template('qrapp/driver_id_pdf.html')
