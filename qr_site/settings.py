@@ -73,7 +73,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'driver_qr_system',       # Your database name
         'USER': 'postgres',               # Change if needed
-        'PASSWORD': 'winshee08',          # PG password
+        'PASSWORD': 'admin',          # PG password
         'HOST': 'localhost',
         'PORT': '5432',
     }

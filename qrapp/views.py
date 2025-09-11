@@ -280,3 +280,4 @@ def download_pdf(request, driver_id):
     })
 
     return HttpResponse("PDF download feature is not yet enabled. (WeasyPrint needed)")
+
