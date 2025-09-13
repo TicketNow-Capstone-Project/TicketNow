@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{{ page_title|default:"Ticket Booking System" }}{% endblock %}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        nav { background: #333; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        nav a { color: white; text-decoration: none; margin: 0 15px; padding: 8px 16px; }
+        nav a:hover { background: #555; border-radius: 4px; }
+        .btn { display: inline-block; padding: 10px 20px; margin: 5px; text-decoration: none; 
+               border-radius: 4px; border: none; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-back { background: #28a745; color: white; }
+        .trips-grid, .tickets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .trip-card, .ticket-card { border: 1px solid #ddd; padding: 20px; border-radius: 5px; }
+        .search-input { padding: 10px; width: 300px; margin-right: 10px; }
+        .detail-section { margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="{%url 'qrapp:dashboard' %}">Return</a>
+        <a>All Trips</a>
+        <a>All Tickets</a>
+        <a>Search</a>
+    </nav>
+    
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+</html>

@@ -216,7 +216,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="sidebar-item {% if active_page == 'tickets' %}active{% endif %}">
+                    <a href="{% url 'tickets:ticket_page' %}" class="sidebar-item {% if active_page == 'tickets' %}active{% endif %}">
                         <i class="fas fa-ticket-alt w-5"></i>
                         <span>Tickets</span>
                     </a>
