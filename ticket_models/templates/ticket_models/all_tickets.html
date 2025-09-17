@@ -1,0 +1,38 @@
+{% extends "ticket_models/base.html" %}
+ {% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Tickets</title>
+</head>
+<body>
+    <h1>All Tickets</h1>
+    <table border="1">
+        <tr>
+            <th>Ticket ID</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Appointed Schedule</th>
+            <th>Trip Name</th>
+            <th>Origin</th>
+            <th>Destination</th>
+        </tr>
+        {% for ticket in tickets %}
+        <tr>
+            <td>{{ ticket.ticket_id }}</td>
+            <td>{{ ticket.price }}</td>
+            <td>{{ ticket.tickets_qty }}</td>
+            <td>{{ ticket.appointed_schedule }}</td>
+            <td>{{ ticket.trip_id.trip_name }}</td>
+            <td>{{ ticket.trip_id.origin }}</td>
+            <td>{{ ticket.trip_id.destination }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">No tickets available</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
+{% endblock %}
