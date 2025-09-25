@@ -6,8 +6,23 @@
     <title>Driver Queue Monitor</title>
     <link rel="shortcut icon" type="image/x-icon" href="{% static 'qrapp/TICKETNOW_LOGO.png' %}" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <meta http-equiv="refresh" content="15">
     <style>
+           :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #1e293b;
+            --accent: #0ea5e9;
+            --background: #0f172a87;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --danger: #ef4444;
+        }
         html, body {
             overflow: hidden;
             height: 100%;
@@ -60,18 +75,71 @@
             width: 2rem;
             height: 2rem;
         }
+
+
+         .btn-back {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+            color: var(--success);
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-back:hover {
+            background: var(--success);
+            color: white;
+            transform: translateY(-2px) scale(1.05);
+        }
+
+          .tooltip {
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -80%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+        .img-logo-container{
+            background-color: white;
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body class="bg-light-blue-body text-white min-h-screen flex flex-col transition-colors duration-500" id="page">
     <div class="bg-ticketnow-blue p-4 flex justify-between items-center header-h-custom">
-        <div class="flex items-center ml-8">
-            <img src="{% static 'qrapp/TICKETNOW_LOGO.png' %}" alt="TicketNow Logo" class="h-24 mr-6">
-            <span class="text-white text-6xl font-extrabold tracking-wider">TICKETNOW</span>
+       <div class="flex items-center gap-4">
+
+             <div>
+                <a href="{% url 'qrapp:dashboard' %}" class="btn-back tooltip" data-tooltip="Return">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+
+            <div class="img-logo-container">
+                <img src="{% static 'qrapp/TICKETNOW_LOGO.png' %}" alt="TicketNow Logo" class="h-12 md:h-16" />
+            </div>
+            <div>
+                <h2 class="text-xl font-bold text-white">TicketNow</h2>
+                <p class="text-sm text-gray-300">Trip Queue Portal</p>
+            </div>
         </div>
-        <a href="{% url 'qrapp:dashboard' %}" 
-           class="bg-white text-ticketnow-blue font-bold py-2 px-6 rounded-full shadow-lg hover:bg-gray-200 transition">
-           ← Back
-        </a>
+
         <button onclick="toggleTheme()" class="flex items-center bg-transparent text-white font-bold py-2 px-4 rounded-full mr-8">
             <svg class="dark-toggle-icon-lg mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9 9 0 008.354-5.646z"></path></svg>
             <span class="text-2xl">DARK</span>
