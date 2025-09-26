@@ -1,38 +1,275 @@
 {% extends "ticket_models/base.html" %}
- {% block content %}
+{% block content %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>All Tickets</title>
+  <meta charset="UTF-8">
+  <title>All Tickets</title>
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --primary-light: #60a5fa;
+      --secondary: #1e293b;
+      --secondary-light: #334155;
+      --accent: #0ea5e9;
+      --accent-light: #38bdf8;
+      --background: #0f172a;
+      --background-light: #1e293b;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-bg-solid: #1e293b;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+
+      --success: #16a34a;
+      --danger: #ef4444;
+      --info: #0ea5e9;
+    }
+
+
+    h1 {
+      text-align: center;
+      color: var(--primary-light);
+      margin-bottom: 20px;
+      font-size: 2rem;
+    }
+
+    .header-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--text-primary);
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .table-container {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 800px;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    th {
+      background: var(--secondary);
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    tr:nth-child(even) {
+      background: var(--background-light);
+    }
+
+    tr:hover {
+      background: var(--secondary-light);
+    }
+
+    td {
+      border-bottom: 1px solid var(--secondary-light);
+      color: var(--text-primary);
+    }
+
+    .empty-row {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 20px;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: var(--card-bg-solid);
+      color: var(--text-primary);
+      padding: 25px;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      position: relative;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--danger);
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .close-btn:hover {
+      background: #dc2626;
+    }
+
+    /* Form */
+    .form-container {
+      margin-top: 15px;
+    }
+
+    form p {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--secondary-light);
+      background: var(--secondary);
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary-light);
+      box-shadow: 0 0 6px var(--primary-light);
+    }
+
+    /* Alerts */
+    .alert {
+      padding: 12px 15px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+
+    .alert-success { background: var(--success); color: white; }
+    .alert-error, .alert-danger { background: var(--danger); color: white; }
+    .alert-info { background: var(--info); color: white; }
+  </style>
 </head>
 <body>
+  <div class="header-actions">
     <h1>All Tickets</h1>
-    <table border="1">
+    <button class="btn-primary" onclick="openModal()">+ Add Ticket</button>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
         <tr>
-            <th>Ticket ID</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Appointed Schedule</th>
-            <th>Trip Name</th>
-            <th>Origin</th>
-            <th>Destination</th>
+          <th>Ticket ID</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Appointed Schedule</th>
+          <th>Trip Name</th>
+          <th>Origin</th>
+          <th>Destination</th>
         </tr>
+      </thead>
+      <tbody>
         {% for ticket in tickets %}
         <tr>
-            <td>{{ ticket.ticket_id }}</td>
-            <td>{{ ticket.price }}</td>
-            <td>{{ ticket.tickets_qty }}</td>
-            <td>{{ ticket.appointed_schedule }}</td>
-            <td>{{ ticket.trip_id.trip_name }}</td>
-            <td>{{ ticket.trip_id.origin }}</td>
-            <td>{{ ticket.trip_id.destination }}</td>
+          <td>{{ ticket.ticket_id }}</td>
+          <td>{{ ticket.price }}</td>
+          <td>{{ ticket.tickets_qty }}</td>
+          <td>{{ ticket.appointed_schedule }}</td>
+          <td>{{ ticket.trip_id.trip_name }}</td>
+          <td>{{ ticket.trip_id.origin }}</td>
+          <td>{{ ticket.trip_id.destination }}</td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="7">No tickets available</td>
+          <td colspan="7" class="empty-row">No tickets available</td>
         </tr>
         {% endfor %}
+      </tbody>
     </table>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="ticketModal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal()">X</button>
+      <h2>Create Ticket</h2>
+
+      <div class="form-container">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn-primary">Save Ticket</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openModal() {
+      document.getElementById("ticketModal").style.display = "flex";
+    }
+    function closeModal() {
+      document.getElementById("ticketModal").style.display = "none";
+    }
+  </script>
 </body>
 </html>
 {% endblock %}

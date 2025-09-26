@@ -4,51 +4,209 @@
 <head>
     <meta charset="UTF-8">
     <title>Accounts Management</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'qrapp/TICKETNOW_LOGO.png' %}" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-[#0b1a2d] text-white">
 
-<div class="p-8">
+<style>
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --secondary: #1e293b;
+        --accent: #0ea5e9;
+        --background: #0f172a87;
+        --card-bg: #1e293b;
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --info: #3b82f6;
+        --danger: #ef4444;
+    }
 
-    <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold">Admin Accounts</h1>
-    <a href="{% url 'qrapp:dashboard' %}"
-       class="block text-center mt-4 text-gray-300 hover:underline">Back to Accounts</a>
-    <a href="{% url 'qrapp:create_account' %}"
-       class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded font-semibold">+ New Admin</a>
+    .header-gradient {
+        background: linear-gradient(90deg, #0f172a, #1e293b, #0f172a);
+    }
+
+    /* Tooltip */
+    .tooltip {
+        position: relative;
+    }
+
+    .tooltip:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: -80%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        z-index: 1000;
+    }
+
+    .img-logo-container {
+        background-color: white;
+        border-radius: 50%;
+    }
+
+    /* Back Button */
+    .btn-back {
+        background: rgba(16, 185, 129, 0.1);
+        border: 2px solid var(--success);
+        color: var(--success);
+        border-radius: 50%;
+        width: 3rem;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-back:hover {
+        background: var(--success);
+        color: white;
+        transform: translateY(-2px) scale(1.05);
+    }
+
+    /* Table Styling */
+    .table-container {
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        overflow-x: auto;
+        margin-top: 1.5rem;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 600px;
+    }
+
+    th {
+        background: var(--secondary);
+        color: var(--text-secondary);
+        padding: 14px 18px;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    td {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--secondary);
+        color: var(--text-primary);
+    }
+
+    tr:nth-child(even) {
+        background: rgba(255,255,255,0.03);
+    }
+
+    tr:hover {
+        background: var(--secondary);
+    }
+
+    .empty-row {
+        text-align: center;
+        color: var(--text-muted);
+        padding: 20px;
+    }
+
+    /* Action buttons */
+    .btn-warning {
+        background: var(--warning);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-warning:hover {
+        background: #d97706;
+    }
+
+    .btn-danger {
+        background: var(--danger);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+    }
+</style>
+
+<!-- HEADER -->
+<header class="header-gradient py-4 px-6 flex justify-between items-center sticky top-0 z-50">
+    <div class="flex items-center gap-4">
+        <div>
+            <a href="{% url 'qrapp:dashboard' %}" class="btn-back tooltip" data-tooltip="Return">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+        <div class="img-logo-container">
+            <img src="{% static 'qrapp/TICKETNOW_LOGO.png' %}" alt="TicketNow Logo" class="h-12 md:h-16" />
+        </div>
+        <div>
+            <h2 class="text-xl font-bold text-white">TicketNow</h2>
+            <p class="text-sm text-gray-300">Accounts Management</p>
+        </div>
     </div>
-    
+    <div class="flex items-center gap-4">
+        <a href="{% url 'qrapp:create_account' %}"
+           class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded font-semibold">
+           + New Admin
+        </a>
+    </div>
+</header>
 
-    <table class="w-full text-left border border-gray-700">
-        <thead class="bg-[#0056b3]">
-            <tr>
-                <th class="p-3">ID</th>
-                <th class="p-3">Username</th>
-                <th class="p-3">Created</th>
-                <th class="p-3">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for admin in admins %}
-            <tr class="border-b border-gray-600">
-                <td class="p-3">{{ admin.id }}</td>
-                <td class="p-3">{{ admin.username }}</td>
-                <td class="p-3">{{ admin.created_at|date:"Y-m-d H:i" }}</td>
-                <td class="p-3 space-x-3">
-                    <a href="{% url 'qrapp:change_password' admin.id %}" 
-                       class="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded">Change Password</a>
-                    <a href="{% url 'qrapp:delete_account' admin.id %}" 
-                       class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded"
-                       onclick="return confirm('Are you sure you want to delete this account?')">Delete</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4" class="p-3 text-center text-gray-400">No admin accounts yet.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<!-- CONTENT -->
+<div class="p-8">
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for admin in admins %}
+                <tr>
+                    <td>{{ admin.id }}</td>
+                    <td>{{ admin.username }}</td>
+                    <td>{{ admin.created_at|date:"Y-m-d H:i" }}</td>
+                    <td class="space-x-3">
+                        <a href="{% url 'qrapp:change_password' admin.id %}" class="btn-warning">Change Password</a>
+                        <a href="{% url 'qrapp:delete_account' admin.id %}" 
+                           class="btn-danger"
+                           onclick="return confirm('Are you sure you want to delete this account?')">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="empty-row">No admin accounts yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 </body>

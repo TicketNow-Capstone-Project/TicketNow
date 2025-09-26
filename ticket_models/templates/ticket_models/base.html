@@ -236,16 +236,6 @@
             display: inline-block;
         }
 
-        h1::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 60px;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            border-radius: 2px;
-        }
 
         p {
             color: var(--text-secondary);
@@ -459,39 +449,27 @@
                 </div>
                 <div class="brand-text">
                     <h2>TicketNow</h2>
-                    <p>Trip Queue Portal</p>
+                    <p>Tickets & Trip Management Portal</p>
                 </div>
             </div>
             
             <ul class="nav-menu">
                 <li class="nav-item">
                     <a href="{% url 'tickets:page_view' 'menu' %}" class="nav-link active">
-                        <i class="fas fa-ticket-alt"></i>
-                        Menu
+                        <i class="fas fa-chart-bar"></i>
+                        Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'tickets:page_view' 'op1' %}" class="nav-link">
+                    <a href="{% url 'tickets:page_view' 'trips' %}" class="nav-link">
                         <i class="fas fa-route"></i>
-                        All Trips
+                        Trip Management
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'tickets:page_view' 'op2' %}" class="nav-link">
+                    <a href="{% url 'tickets:page_view' 'tickets' %}" class="nav-link">
                         <i class="fas fa-ticket-alt"></i>
-                        All Tickets
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'tickets:page_view' 'op3' %}" class="nav-link">
-                        <i class="fas fa-plus-circle"></i>
-                        Create A Ticket
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'tickets:page_view' 'op4' %}" class="nav-link">
-                        <i class="fas fa-plane-departure"></i>
-                        Create a Trip
+                        Manage Tickets
                     </a>
                 </li>
             </ul>
@@ -503,8 +481,31 @@
     </header>
     
     <div class="container">
-         {% block content %}
-         {% endblock %}
+
+        {% block content %}
+            <div class="main-content">
+                        <h1>Ticket Booking Dashboard</h1>
+                        <p>Welcome to your ticket booking management system. Here you can manage trips, tickets, and bookings. Use the navigation menu to access different sections of the system.</p>
+                        
+                        <div class="stats-container">
+                            <div class="stat-card">
+                                <i class="fas fa-route"></i>
+                                <h3>128</h3>
+                                <p>Active Trips</p>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-ticket-alt"></i>
+                                <h3>542</h3>
+                                <p>Tickets Sold</p>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-users"></i>
+                                <h3>324</h3>
+                                <p>Active Users</p>
+                            </div>
+                        </div>
+                    </div>
+        {% endblock %}
     </div>
 
     <script>
