@@ -169,7 +169,7 @@
         </div>
 
         <div class="bg-ticketnow-blue rounded-lg shadow-xl p-10 w-full max-w-7xl">
-            {% if queue %}
+        
                 <table class="w-full table-auto text-center auto-scale-table-text">
                     <thead>
                         <tr class="bg-table-header-blue text-white text-3xl">
@@ -180,28 +180,11 @@
                             <th class="py-5 px-4 rounded-tr-lg">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="queue-body">
-                        {% for item in queue %}
-                            <tr class="{% if forloop.counter|divisibleby:2 %}bg-table-row-dark{% else %}bg-table-row-light{% endif %} border-b border-ticketnow-blue hover:bg-table-header-blue text-2xl">
-                                <td class="py-5 px-4">{{ forloop.counter }}</td>
-                                <td class="py-5 px-4">{{ item.driver.route_taken }}</td>
-                                <td class="py-5 px-4">{{ item.departure_time|date:"h:i A" }}</td>
-                                <td class="py-5 px-4">{{ item.driver.plate_number }}</td>
-                                <td class="py-5 px-4">
-                                    <form action="{% url 'qrapp:mark_done' item.id %}" method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn-done-green text-white font-bold py-4 px-10 rounded-full shadow-lg text-xl">
-                                            Done
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
+                    
                 </table>
-            {% else %}
+          
                 <p class="text-center text-4xl text-gray-400 mt-16">No drivers in queue.</p>
-            {% endif %}
+            
         </div>
     </div>
 
@@ -269,4 +252,3 @@
     
 </body>
 </html>
-

@@ -1,15 +1,38 @@
 from django import forms
-from .models import Trip_Table, Ticket_Table
+from .models import Trip_Table, Ticket_Table, Driver_Table, Vehicle_Table
 
 class TripForm(forms.ModelForm):
     class Meta:
         model = Trip_Table
-        fields = ['trip_name', 'origin', 'destination']
+        exclude = ['id']
+        widgets = {
+            'departure_time': forms.DateTimeInput(
+                attrs={'type': 'datetime-local', 'class': 'form-control'}
+            ),
+        }
+
 
 class TicketForm(forms.ModelForm):
     class Meta:
         model = Ticket_Table
-        fields = ["price", "appointed_schedule", "tickets_qty", "trip_id"]
+        # Include all fields automatically (except the auto ID)
+        exclude = ['id']
+
+
+class DriverForm(forms.ModelForm):
+    class Meta:
+        model = Driver_Table
+        # Include all fields automatically (except the auto ID)\
+        exclude = ['id']
         widgets = {
-            "appointed_schedule": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+            'license_expiry': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
+
+        
+
+
+class VehicleForm(forms.ModelForm):
+    class Meta:
+        model = Vehicle_Table
+        # Include all fields automatically (except the auto ID)
+        exclude = ['id']

@@ -3,7 +3,9 @@ from . import views
 
 app_name = "tickets"   # 👈 this enables {% url 'tickets:home' %}
 urlpatterns = [
-    path("ticket_page/", views.ticket_page, name="ticket_page"),   # this will be 'tickets:home'
-    path('ticket_page/<str:page_name>/', views.page_view, name='page_view'),
+    path("operations/", views.operations_page, name="operations"),
+    path("resources/", views.resources_page, name="resources"),
+    path('operations/<str:page_name>/', views.operations_page_view, name='operations_page_view'),
+    path('resources/<str:page_name>/', views.resources_page_view, name='resources_page_view'),
 ]
 

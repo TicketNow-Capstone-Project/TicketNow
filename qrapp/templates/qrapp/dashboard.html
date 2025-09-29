@@ -216,15 +216,16 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'tickets:ticket_page' %}" class="sidebar-item {% if active_page == 'tickets' %}active{% endif %}">
-                        <i class="fas fa-ticket-alt w-5"></i>
-                        <span>Tickets</span>
+                    <a href="{% url 'tickets:resources' %}" class="sidebar-item {% if active_page == 'tickets' %}active{% endif %}">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+
+                        <span>Resources Management</span>
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'qrapp:generate_qr' %}" class="sidebar-item {% if active_page == 'drivers' %}active{% endif %}">
-                        <i class="fas fa-user-friends w-5"></i>
-                        <span>Drivers</span>
+                        <i class="fas fa-id-card w-5"></i>
+                        <span>Driver Authorization</span>
                     </a>
                 </li>
                 <li>
@@ -234,7 +235,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'qrapp:queue_monitor' %}" class="sidebar-item {% if active_page == 'trip_queue' %}active{% endif %}">
+                    <a href="{% url 'tickets:operations' %}" class="sidebar-item {% if active_page == 'trip_queue' %}active{% endif %}">
                         <i class="fas fa-list-ol w-5"></i>
                         <span>Trip Queue</span>
                     </a>

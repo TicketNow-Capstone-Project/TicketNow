@@ -9,8 +9,6 @@ from pathlib import Path
 
 
 
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -72,7 +70,7 @@ WSGI_APPLICATION = 'qr_site.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'driver_qr_system',       # Your database name
+        'NAME': 'TicketNow',       # Your database name
         'USER': 'postgres',               # Change if needed
         'PASSWORD': 'admin',          # PG password
         'HOST': 'localhost',

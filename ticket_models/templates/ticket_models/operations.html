@@ -6,30 +6,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{{ page_title|default:"Ticket Booking System" }}{% endblock %}</title>
     <link rel="shortcut icon" type="image/x-icon" href="{% static 'qrapp/TICKETNOW_LOGO.png' %}" />
+    <link rel="stylesheet" href="{% static 'ticket_models/menu.css' %}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --secondary: #1e293b;
-            --secondary-light: #334155;
-            --accent: #0ea5e9;
-            --accent-light: #38bdf8;
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --primary-light: #4895ef;
+            --secondary: #7209b7;
+            --secondary-light: #560bad;
+            --accent: #f72585;
+            --accent-light: #b5179e;
             --background: #0f172a;
             --background-light: #1e293b;
-            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-bg: rgba(30, 41, 59, 0.9);
             --card-bg-solid: #1e293b;
             --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
+            --text-secondary: #e2e8f0;
             --text-muted: #94a3b8;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
             --success: #10b981;
-            --warning: #f59e0b;
-            --info: #3b82f6;
             --danger: #ef4444;
-            --gradient-start: #0f172a;
-            --gradient-end: #1e293b;
+            --warning: #f59e0b;
+            --info: #06b6d4;
         }
 
         * {
@@ -40,7 +43,7 @@
 
         body {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            background: var(--background);
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
@@ -56,8 +59,8 @@
             width: 100%;
             height: 100%;
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(14, 165, 233, 0.1) 0%, transparent 20%);
+                radial-gradient(circle at 10% 20%, rgba(67, 97, 238, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(245, 37, 133, 0.1) 0%, transparent 20%);
             z-index: -1;
         }
 
@@ -147,7 +150,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(67, 97, 238, 0.2), transparent);
             transition: left 0.5s;
         }
 
@@ -164,7 +167,7 @@
         }
 
         .nav-link:hover {
-            background: rgba(59, 130, 246, 0.1);
+            background: rgba(67, 97, 238, 0.1);
             color: var(--text-primary);
             transform: translateY(-2px);
         }
@@ -176,7 +179,7 @@
         .nav-link.active {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
         }
 
         .nav-link.active:hover {
@@ -205,63 +208,52 @@
             box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3);
         }
 
-        .main-content {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 30px;
-            margin-top: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .main-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
+        /* Dashboard Styles */
+        .header-section {
+            margin-bottom: 40px;
         }
 
         h1 {
+            margin: 0 0 16px 0;
             color: var(--text-primary);
-            margin-bottom: 20px;
+            font-size: 2.5rem;
             font-weight: 700;
-            font-size: 2.2rem;
-            position: relative;
-            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-
-        p {
-            color: var(--text-secondary);
-            line-height: 1.8;
-            margin-bottom: 20px;
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 0;
+            max-width: 600px;
         }
 
         .stats-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
         }
 
         .stat-card {
-            background: linear-gradient(135deg, var(--card-bg-solid), var(--secondary-light));
-            border-radius: 12px;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--card-bg);
+            padding: 32px 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
         .stat-card::before {
@@ -269,39 +261,141 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(14, 165, 233, 0.1));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .stat-card:hover::before {
-            opacity: 1;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
         }
 
         .stat-card i {
             font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: var(--primary-light);
-            z-index: 1;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .stat-card h3 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
+            font-size: 2.5rem;
             font-weight: 700;
-            z-index: 1;
+            margin: 0 0 8px 0;
+            color: var(--text-primary);
         }
 
         .stat-card p {
             color: var(--text-muted);
-            z-index: 1;
+            font-size: 1rem;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .action-card {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .action-card h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .action-card p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .recent-activity {
+            background: var(--card-bg);
+            padding: 32px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .recent-activity h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0 0 24px 0;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .activity-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content p {
+            margin: 0 0 4px 0;
+            color: var(--text-primary);
+        }
+
+        .activity-time {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
         }
 
         .mobile-toggle {
@@ -400,18 +494,26 @@
                 padding: 15px;
             }
             
-            .main-content {
-                padding: 20px;
-                margin-top: 20px;
-            }
-            
             h1 {
-                font-size: 1.8rem;
+                font-size: 2rem;
             }
             
             .stats-container {
                 grid-template-columns: 1fr;
-                gap: 20px;
+                gap: 16px;
+            }
+            
+            .stat-card {
+                padding: 24px 20px;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .recent-activity {
+                padding: 24px;
             }
         }
 
@@ -432,6 +534,23 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary-light);
         }
+           .dashboard-title {
+      margin: 0 0 16px 0;
+      color: var(--text-primary);
+      font-size: 2.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary-light), var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .dashboard-subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      margin: 0;
+      max-width: 600px;
+    }
     </style>
 </head>
 <body>
@@ -455,21 +574,27 @@
             
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="{% url 'tickets:page_view' 'menu' %}" class="nav-link active">
+                    <a href="{% url 'tickets:operations_page_view' 'menu' %}" class="nav-link active">
                         <i class="fas fa-chart-bar"></i>
                         Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'tickets:page_view' 'trips' %}" class="nav-link">
-                        <i class="fas fa-route"></i>
-                        Trip Management
+                    <a href="{% url 'tickets:operations_page_view' 'bookings' %}" class="nav-link active">
+                        <i class="fas fa-chart-bar"></i>
+                        Bookings
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'tickets:page_view' 'tickets' %}" class="nav-link">
+                    <a href="{% url 'tickets:operations_page_view' 'trips' %}" class="nav-link">
+                        <i class="fas fa-route"></i>
+                        Trips
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'tickets:operations_page_view' 'tickets' %}" class="nav-link">
                         <i class="fas fa-ticket-alt"></i>
-                        Manage Tickets
+                        Tickets
                     </a>
                 </li>
             </ul>
@@ -481,30 +606,8 @@
     </header>
     
     <div class="container">
-
         {% block content %}
-            <div class="main-content">
-                        <h1>Ticket Booking Dashboard</h1>
-                        <p>Welcome to your ticket booking management system. Here you can manage trips, tickets, and bookings. Use the navigation menu to access different sections of the system.</p>
-                        
-                        <div class="stats-container">
-                            <div class="stat-card">
-                                <i class="fas fa-route"></i>
-                                <h3>128</h3>
-                                <p>Active Trips</p>
-                            </div>
-                            <div class="stat-card">
-                                <i class="fas fa-ticket-alt"></i>
-                                <h3>542</h3>
-                                <p>Tickets Sold</p>
-                            </div>
-                            <div class="stat-card">
-                                <i class="fas fa-users"></i>
-                                <h3>324</h3>
-                                <p>Active Users</p>
-                            </div>
-                        </div>
-                    </div>
+            
         {% endblock %}
     </div>
 
@@ -532,6 +635,15 @@
             } else {
                 link.classList.remove('active');
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects and animations
+            const statCards = document.querySelectorAll('.stat-card');
+            const actionCards = document.querySelectorAll('.action-card');
+            
+            // You can add any JavaScript interactions here
+            // For example, real-time updates or animations
         });
     </script>
 </body>
