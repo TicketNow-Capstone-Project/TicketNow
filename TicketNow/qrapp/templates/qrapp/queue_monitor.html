@@ -1,0 +1,254 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Driver Queue Monitor</title>
+    <link rel="shortcut icon" type="image/x-icon" href="{% static 'qrapp/TICKETNOW_LOGO.png' %}" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <meta http-equiv="refresh" content="15">
+    <style>
+           :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #1e293b;
+            --accent: #0ea5e9;
+            --background: #0f172a87;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --danger: #ef4444;
+        }
+        html, body {
+            overflow: hidden;
+            height: 100%;
+        }
+        /* Custom colors based on the image for precision */
+        .bg-ticketnow-blue {
+            background-color: #0A2647;
+        }
+        .bg-light-blue-body {
+            background-color: #ADD8E6; /* Light Blue */
+        }
+        .text-ticketnow-blue {
+            color: #0A2647;
+        }
+        .bg-table-header-blue {
+            background-color: #1C4C7E;
+        }
+        .bg-table-row-dark {
+            background-color: #0F355A;
+        }
+        .bg-table-row-light {
+            background-color: #143F6C;
+        }
+        .btn-done-green {
+            background-color: #28A745;
+        }
+        .btn-done-green:hover {
+            background-color: #218838;
+        }
+        /* New custom color for the footer background */
+        .bg-footer-blue {
+            background-color: #001B2C;
+        }
+
+        /* Responsive font size for table cells */
+        .auto-scale-table-text {
+            font-size: clamp(0.8rem, 1.2vw, 1.5rem);
+        }
+        /* Specific height for header to match image more closely */
+        .header-h-custom {
+            height: 120px;
+        }
+        /* Larger icon for terminal buttons */
+        .terminal-icon-lg {
+            width: 2.5rem;
+            height: 2.5rem;
+        }
+        /* Larger icon for DARK toggle */
+        .dark-toggle-icon-lg {
+            width: 2rem;
+            height: 2rem;
+        }
+
+
+         .btn-back {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+            color: var(--success);
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-back:hover {
+            background: var(--success);
+            color: white;
+            transform: translateY(-2px) scale(1.05);
+        }
+
+          .tooltip {
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -80%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+        .img-logo-container{
+            background-color: white;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body class="bg-light-blue-body text-white min-h-screen flex flex-col transition-colors duration-500" id="page">
+    <div class="bg-ticketnow-blue p-4 flex justify-between items-center header-h-custom">
+       <div class="flex items-center gap-4">
+
+             <div>
+                <a href="{% url 'qrapp:dashboard' %}" class="btn-back tooltip" data-tooltip="Return">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+
+            <div class="img-logo-container">
+                <img src="{% static 'qrapp/TICKETNOW_LOGO.png' %}" alt="TicketNow Logo" class="h-12 md:h-16" />
+            </div>
+            <div>
+                <h2 class="text-xl font-bold text-white">TicketNow</h2>
+                <p class="text-sm text-gray-300">Trip Queue Portal</p>
+            </div>
+        </div>
+
+        <button onclick="toggleTheme()" class="flex items-center bg-transparent text-white font-bold py-2 px-4 rounded-full mr-8">
+            <svg class="dark-toggle-icon-lg mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9 9 0 008.354-5.646z"></path></svg>
+            <span class="text-2xl">DARK</span>
+        </button>
+    </div>
+
+    <div class="flex flex-col items-center px-8 py-10 flex-grow">
+        <h1 class="text-5xl font-extrabold text-ticketnow-blue mb-12">TERMINAL DRIVER QUEUE</h1>
+
+        <div class="flex justify-center space-x-8 mb-16">
+            <button onclick="selectTerminal('terminal1')" id="terminal1" class="terminal-button flex items-center space-x-4 bg-white rounded-full px-8 py-4 border-4 border-blue-400 cursor-pointer shadow-xl transition-all duration-200">
+                <svg class="terminal-icon-lg text-blue-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                <span class="text-2xl text-blue-600 font-semibold">TERMINAL 1</span>
+            </button>
+            <button onclick="selectTerminal('terminal2')" id="terminal2" class="terminal-button flex items-center space-x-4 bg-ticketnow-blue rounded-full px-8 py-4 border-4 border-ticketnow-blue cursor-pointer shadow-xl transition-all duration-200">
+                <svg class="terminal-icon-lg text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                <span class="text-2xl text-white font-semibold">TERMINAL 2</span>
+            </button>
+            <button onclick="selectTerminal('terminal3')" id="terminal3" class="terminal-button flex items-center space-x-4 bg-white rounded-full px-8 py-4 border-4 border-blue-400 cursor-pointer shadow-xl transition-all duration-200">
+                <svg class="terminal-icon-lg text-blue-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                <span class="text-2xl text-blue-600 font-semibold">TERMINAL 3</span>
+            </button>
+            <button onclick="selectTerminal('terminal4')" id="terminal4" class="terminal-button flex items-center space-x-4 bg-white rounded-full px-8 py-4 border-4 border-blue-400 cursor-pointer shadow-xl transition-all duration-200">
+                <svg class="terminal-icon-lg text-blue-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-7-8a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                <span class="text-2xl text-blue-600 font-semibold">TERMINAL 4</span>
+            </button>
+        </div>
+
+        <div class="bg-ticketnow-blue rounded-lg shadow-xl p-10 w-full max-w-7xl">
+        
+                <table class="w-full table-auto text-center auto-scale-table-text">
+                    <thead>
+                        <tr class="bg-table-header-blue text-white text-3xl">
+                            <th class="py-5 px-4 rounded-tl-lg">#</th>
+                            <th class="py-5 px-4">Route</th>
+                            <th class="py-5 px-4">Departure Time</th>
+                            <th class="py-5 px-4">Plate Number</th>
+                            <th class="py-5 px-4 rounded-tr-lg">Action</th>
+                        </tr>
+                    </thead>
+                    
+                </table>
+          
+                <p class="text-center text-4xl text-gray-400 mt-16">No drivers in queue.</p>
+            
+        </div>
+    </div>
+
+    <div class="bg-footer-blue p-6 text-white text-right text-lg font-bold">
+        <p>123-456-7890</p>
+        <p>Maasin City, Southern Leyte</p>
+        <p>TicketNow.com</p>
+    </div>
+
+    <audio id="alert-sound" src="{% static 'qrapp/beep.mp3' %}" preload="auto"></audio>
+
+    <script>
+        function toggleTheme() {
+            const body = document.getElementById('page');
+            body.classList.toggle('bg-light-blue-body');
+            body.classList.toggle('bg-gray-900');
+        }
+
+        function selectTerminal(terminalId) {
+            document.querySelectorAll('.terminal-button').forEach(button => {
+                button.classList.remove('bg-ticketnow-blue', 'border-ticketnow-blue');
+                button.classList.add('bg-white', 'border-blue-400');
+                button.querySelector('svg').classList.remove('text-white');
+                button.querySelector('svg').classList.add('text-blue-600');
+                button.querySelector('span').classList.remove('text-white');
+                button.querySelector('span').classList.add('text-blue-600');
+            });
+
+            const selectedButton = document.getElementById(terminalId);
+            selectedButton.classList.remove('bg-white', 'border-blue-400');
+            selectedButton.classList.add('bg-ticketnow-blue', 'border-ticketnow-blue');
+            selectedButton.querySelector('svg').classList.remove('text-blue-600');
+            selectedButton.querySelector('svg').classList.add('text-white');
+            selectedButton.querySelector('span').classList.remove('text-blue-600');
+            selectedButton.querySelector('span').classList.add('text-white');
+
+            console.log('Selected Terminal:', terminalId);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            selectTerminal('terminal2');
+        });
+
+        let prevCount = document.getElementById('queue-body').children.length;
+
+        setInterval(() => {
+            fetch(window.location.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(res => res.text())
+                .then(html => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = html;
+                    const newRows = temp.querySelectorAll('#queue-body tr');
+                    const newCount = newRows.length;
+
+                    if (newCount > prevCount) {
+                        document.getElementById('alert-sound').play();
+                    }
+                    prevCount = newCount;
+                });
+        }, 10000);
+
+        // short beep
+        
+    </script>
+    
+</body>
+</html>

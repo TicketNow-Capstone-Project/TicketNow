@@ -1,0 +1,116 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Driver QR Scanner</title>
+    <link rel="shortcut icon" type="image/x-xicon" href="{% static 'qrapp/TICKETNOW_LOGO.png' %}" />
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #032b5b;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <div class="w-full h-16 flex items-center px-4 md:px-8" style="background-color: #01244e;">
+        <a href="{% url 'qrapp:generate_qr' %}" class="flex items-center text-white text-lg hover:text-gray-300 transition-colors duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+        </a>
+    </div>
+
+    <main class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-lg mx-auto p-4 md:p-8 rounded-3xl shadow-lg border-2" style="background-color: #f0f8ff; border-color: #00bcd4;">
+            <div class="flex flex-col items-center space-y-4">
+                <div class="flex items-center space-x-2">
+                    <img src="{% static 'qrapp/TICKETNOW_LOGO.png' %}" alt="TicketNow Logo" class="w-10 h-10">
+                    <h2 class="text-xl md:text-2xl font-semibold text-gray-800">DRIVER QR CODE:</h2>
+                </div>
+                
+                <div id="reader" class="w-full max-w-sm aspect-square rounded-xl overflow-hidden"></div>
+                
+                <p id="scan-result" class="text-center font-medium text-gray-700 mt-2"></p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="w-full py-4 text-center text-sm" style="background-color: #01244e; color: #f0f8ff;">
+        <div class="flex flex-col md:flex-row items-center justify-center space-y-1 md:space-y-0 md:space-x-8">
+            <p>123-400-7899</p>
+            <p>Maasin City, Southern Leyte</p>
+            <p>TicketNow.com</p>
+        </div>
+    </footer>
+
+    <script>
+        const queueList = document.getElementById('driver-queue');
+        const scanResult = document.getElementById('scan-result');
+        const scannedDrivers = new Set();
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            if (!scannedDrivers.has(decodedText)) {
+                scannedDrivers.add(decodedText);
+
+                const lines = decodedText.trim().split("\n");
+                const plateNumber = lines[3]?.trim();
+
+                if (!plateNumber) {
+                    scanResult.textContent = "Invalid QR format.";
+                    return;
+                }
+
+                fetch("{% url 'qrapp:ajax_scan_driver' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ plate_number: plateNumber })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    scanResult.textContent = data.message;
+                    if (data.success) {
+                        const li = document.createElement('li');
+                        li.textContent = `${data.plate_number} – Route: ${data.route} – Departure: ${data.departure_time}`;
+                        if(queueList) {
+                            queueList.appendChild(li);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error("Scan error:", error);
+                    scanResult.textContent = "Scan failed. Try again.";
+                });
+            } else {
+                scanResult.textContent = "Driver already scanned.";
+            }
+        }
+
+        const html5QrcodeScanner = new Html5QrcodeScanner("reader", {
+            fps: 10,
+            qrbox: 250
+        });
+        html5QrcodeScanner.render(onScanSuccess);
+    </script>
+</body>
+</html>

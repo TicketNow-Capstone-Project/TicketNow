@@ -1,0 +1,394 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #1e293b;
+            --accent: #0ea5e9;
+            --background: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --danger: #ef4444;
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--background);
+            color: var(--text-primary);
+        }
+        
+        .dashboard-container { 
+            background: linear-gradient(135deg, var(--background) 0%, #0b1a2d 100%);
+        }
+        
+        .sidebar { 
+            background: linear-gradient(to bottom, var(--secondary), #0f172a);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-item { 
+            color: var(--text-secondary); 
+            padding: 0.875rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .sidebar-item:hover, .sidebar-item.active { 
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            transform: translateX(4px);
+        }
+        
+        .card { 
+            background-color: var(--card-bg);
+            border-radius: 1rem; 
+            color: white; 
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+        
+        .card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+        
+        .ticket-status { 
+            font-size: 0.75rem; 
+            padding: 0.25rem 0.75rem; 
+            border-radius: 9999px; 
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .confirmed { background-color: var(--success); color: white; }
+        .pending { background-color: var(--warning); color: black; }
+        .loading { background-color: var(--info); color: white; }
+        .ready { background-color: var(--success); color: white; }
+        
+        .btn {
+            padding: 0.5rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(90deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.4);
+        }
+        
+        .header-gradient {
+            background: linear-gradient(90deg, var(--secondary) 0%, var(--background) 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+        
+        /* Animation for cards */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-white">
+
+<div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <div class="sidebar w-64 p-4 flex flex-col justify-between">
+        <div>
+            <div class="flex items-center mb-8 px-4 py-3 
+            bg-white/10 backdrop-blur-md 
+            rounded-xl shadow-lg">
+                <!-- Circle container for logo -->
+                <div class="bg-white rounded-full p-2 flex items-center justify-center">
+                    <img src="{% static 'qrapp/TICKETNOW_LOGO.png' %}" alt="TicketNow Logo" class="h-12 md:h-14">
+                </div>
+                <span class="font-bold italic text-lg ml-3 text-white">
+                    TICKETNOW
+                </span>
+
+            </div>
+
+
+            <ul class="space-y-2">
+                <li>
+                    <a href="{% url 'qrapp:dashboard' %}" class="sidebar-item {% if active_page == 'overview' %}active{% endif %}">
+                        <i class="fas fa-chart-pie w-5"></i>
+                        <span>Overview</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'tickets:resources' %}" class="sidebar-item {% if active_page == 'tickets' %}active{% endif %}">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+
+                        <span>Resources Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'qrapp:generate_qr' %}" class="sidebar-item {% if active_page == 'drivers' %}active{% endif %}">
+                        <i class="fas fa-id-card w-5"></i>
+                        <span>Driver Authorization</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="sidebar-item {% if active_page == 'destinations' %}active{% endif %}">
+                        <i class="fas fa-map-marker-alt w-5"></i>
+                        <span>Destinations</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'tickets:operations' %}" class="sidebar-item {% if active_page == 'trip_queue' %}active{% endif %}">
+                        <i class="fas fa-list-ol w-5"></i>
+                        <span>Trip Queue</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'qrapp:accounts' %}" class="sidebar-item {% if active_page == 'accounts' %}active{% endif %}">
+                        <i class="fas fa-user-cog w-5"></i>
+                        <span>Accounts</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="p-4 mt-8 text-xs text-gray-400 bg-[#1e293b] rounded-xl">
+            <p class="flex items-center gap-2 mb-2"><i class="fas fa-phone-alt"></i> 123-400-7899</p>
+            <p class="flex items-center gap-2 mb-2"><i class="fas fa-map-marker-alt"></i> Maasin City, Southern Leyte</p>
+            <p class="flex items-center gap-2"><i class="fas fa-globe"></i> TicketNow.com</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-8 overflow-y-auto">
+        <!-- Header -->
+        <header class="header-gradient flex justify-between items-center mb-8 p-4 rounded-xl">
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">ADMIN DASHBOARD</h1>
+            <div class="flex items-center gap-4">
+                <div class="avatar">
+                    <span>A</span>
+                </div>
+                <a href="{% url 'qrapp:logout' %}" 
+                class="btn btn-danger">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="col-span-1 md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <!-- Total Tickets -->
+                <div class="card stat-card p-6 flex flex-col items-center text-center animate-fade-in">
+                    <div class="mb-3 w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                        <i class="fas fa-ticket-alt text-blue-400 text-xl"></i>
+                    </div>
+                    <span class="text-3xl font-bold relative z-10">{{ total_tickets }}</span>
+                    <span class="text-sm text-gray-400 mt-1">TOTAL TICKETS</span>
+                </div>
+                <!-- Active Drivers -->
+                <div class="card stat-card p-6 flex flex-col items-center text-center animate-fade-in delay-100">
+                    <div class="mb-3 w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                        <i class="fas fa-user-friends text-green-400 text-xl"></i>
+                    </div>
+                    <span class="text-3xl font-bold relative z-10">{{ active_drivers }}</span>
+                    <span class="text-sm text-gray-400 mt-1">ACTIVE DRIVERS</span>
+                </div>
+                <!-- Registered Vehicles -->
+                <div class="card stat-card p-6 flex flex-col items-center text-center animate-fade-in delay-200">
+                    <div class="mb-3 w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center">
+                        <i class="fas fa-bus text-purple-400 text-xl"></i>
+                    </div>
+                    <span class="text-3xl font-bold relative z-10">{{ registered_vehicles }}</span>
+                    <span class="text-sm text-gray-400 mt-1">REGISTERED VEHICLES</span>
+                </div>
+                <!-- Pending Trips -->
+                <div class="card stat-card p-6 flex flex-col items-center text-center animate-fade-in delay-300">
+                    <div class="mb-3 w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center">
+                        <i class="fas fa-clock text-amber-400 text-xl"></i>
+                    </div>
+                    <span class="text-3xl font-bold relative z-10">{{ pending_trips }}</span>
+                    <span class="text-sm text-gray-400 mt-1">PENDING TRIPS</span>
+                </div>
+            </div>
+
+            <!-- Right Section -->
+            <div class="col-span-1 space-y-6">
+                <!-- Recent Tickets -->
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">RECENT TICKETS</h2>
+                        <a href="#" class="text-sm text-blue-400 hover:text-blue-300 flex items-center">
+                            View all <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
+                    <div class="space-y-4">
+                        {% for ticket in recent_tickets %}
+                        <div class="flex justify-between items-center p-3 rounded-lg hover:bg-slate-700/30 transition-colors">
+                            <div>
+                                <h3 class="font-semibold">{{ ticket.name }}</h3>
+                                <p class="text-xs text-gray-400 mt-1">{{ ticket.route }}</p>
+                                <span class="ticket-status {{ ticket.status|lower }} mt-2">
+                                    {{ ticket.status }}
+                                </span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-bold bg-slate-700/50 px-2 py-1 rounded">{{ ticket.vehicle_type }}</span>
+                                <p class="text-sm mt-1">{{ ticket.time }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-gray-400 text-sm text-center py-4">No recent tickets.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Trip Queue -->
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">TRIP QUEUE STATUS</h2>
+                        <a href="{% url 'qrapp:queue_monitor' %}" class="text-sm text-blue-400 hover:text-blue-300 flex items-center">
+                            View all <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                        </a>
+                    </div>
+                    <div class="space-y-4">
+                        {% for item in trip_queue %}
+                        <div class="flex justify-between items-center p-3 rounded-lg hover:bg-slate-700/30 transition-colors">
+                            <div>
+                                <h3 class="font-semibold">{{ item.driver_name }}</h3>
+                                <p class="text-xs text-gray-400 mt-1">{{ item.destination }}</p>
+                                <span class="ticket-status {{ item.status|lower }} mt-2">
+                                    {{ item.status }}
+                                </span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-bold bg-slate-700/50 px-2 py-1 rounded">{{ item.passengers }} passengers</span>
+                                <p class="text-sm mt-1">{{ item.time }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-gray-400 text-sm text-center py-4">No trips in queue.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add subtle animations to elements when they come into view
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.card');
+        
+        cards.forEach(card => {
+            card.style.opacity = '0';
+        });
+        
+        setTimeout(() => {
+            cards.forEach(card => {
+                card.style.transition = 'opacity 0.5s ease, transform 0.3s ease';
+                card.style.opacity = '1';
+            });
+        }, 100);
+    });
+</script>
+</body>
+</html>

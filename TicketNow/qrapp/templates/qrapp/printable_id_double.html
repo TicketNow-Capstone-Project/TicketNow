@@ -1,0 +1,128 @@
+<!--    NEED MAHUMNON    -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Driver ID</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .id-card {
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+        }
+        .id-card.flipped {
+            transform: rotateY(180deg);
+        }
+        .id-front, .id-back {
+            backface-visibility: hidden;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .id-back {
+            transform: rotateY(180deg);
+        }
+        @media print {
+            body * { visibility: hidden; }
+            .id-card, .id-card * { visibility: visible; }
+            .id-card { position: absolute; left: 0; top: 0; width: 100%; transform: rotateY(0deg); }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center p-4 bg-gray-100 min-h-screen">
+
+    <!-- ID Card Container -->
+    <div class="id-container w-[350px] h-[220px] relative flex items-center justify-center">
+        <div class="id-card w-full h-full relative" id="idCard">
+            
+            <!-- FRONT SIDE -->
+            <div class="id-front bg-gradient-to-br from-blue-900 to-blue-500 text-white flex p-4">
+                <div class="flex flex-row w-full h-full">
+                    <!-- Photo -->
+                    <div class="photo w-24 h-24 rounded-md overflow-hidden flex-shrink-0 mt-[20px] self-start">
+                        {% if driver.driver_image %}
+                            <img src="{{ driver.driver_image.url }}" alt="Driver Photo" class="w-full h-full object-cover">
+                        {% else %}
+                            <span>No Image</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Info + QR -->
+                    <div class="flex-1 flex flex-col justify-between ml-4 relative">
+                        <div class="space-y-1 mt-2">
+                            <h2 class="text-lg font-bold truncate">{{ driver.first_name }} {{ driver.last_name }}</h2>
+                            <p class="text-sm truncate"><strong>Vehicle:</strong> {{ driver.vehicle_type }}</p>
+                            <p class="text-sm truncate"><strong>Plate:</strong> {{ driver.plate_number }}</p>
+                            <p class="text-sm truncate"><strong>Route:</strong> {{ driver.route_taken }}</p>
+                        </div>
+
+                        <!-- QR Code bottom-right -->
+                        <div class="qr w-16 h-16 self-end mt-2">
+                            <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code" class="w-full h-full">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BACK SIDE -->
+            <div class="id-back bg-gray-200 flex flex-col justify-between p-4 border-2 border-blue-900">
+                <div class="logo text-center">
+                    <img src="{% static 'qrapp/TICKETNOW_LOGO.png' %}" alt="Company Logo" class="w-16 h-auto mx-auto">
+                </div>
+                <div class="contact text-sm">
+                    <p>Company: Your Transport Co.</p>
+                    <p>Address: 123 Main Street, City</p>
+                    <p>Emergency Contact: (02) 123-4567</p>
+                </div>
+                <div class="note text-sm">
+                    <p>This ID is property of the company. Must be presented upon request.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="button-container flex gap-4 mt-4 no-print">
+        <button class="px-4 py-2 bg-blue-900 text-white rounded" onclick="flipCard()">Flip ID</button>
+        <button class="px-4 py-2 bg-blue-900 text-white rounded" onclick="printCard()">Print ID</button>
+    </div>
+
+<script>
+function flipCard() {
+    const card = document.getElementById('idCard');
+    card.classList.toggle('flipped');
+}
+
+function printCard() {
+    const card = document.getElementById('idCard');
+
+    const front = card.querySelector('.id-front').cloneNode(true);
+    const back = card.querySelector('.id-back').cloneNode(true);
+
+    const printContainer = document.createElement('div');
+    printContainer.className = 'flex flex-col items-center';
+
+    front.style.transform = 'rotateY(0deg)';
+    front.style.pageBreakAfter = 'always';
+    printContainer.appendChild(front);
+
+    back.style.transform = 'rotateY(0deg)';
+    printContainer.appendChild(back);
+
+    const originalBody = document.body.innerHTML;
+    document.body.innerHTML = '';
+    document.body.appendChild(printContainer);
+
+    window.print();
+
+    document.body.innerHTML = originalBody;
+}
+</script>
+
+</body>
+</html>
